@@ -1,0 +1,2924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SlimAura — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--purple:#7c3aed;--purple-dark:#5b21b6;--purple-light:#a855f7;--black:#0d0d14;--sw:240px;--white:#fff;--gray:#f7f8fa;--border:#e8e8e8;--text:#333;--muted:#888}
+body{font-family:'Nunito',sans-serif;background:var(--gray);color:var(--text);min-height:100vh}
+
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d0d14,#1a0d2e)}
+.login-card{background:#fff;border-radius:24px;padding:44px 36px;border-top:4px solid #7c3aed;width:100%;max-width:380px;box-shadow:0 24px 80px rgba(0,0,0,.3)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo h1{font-size:26px;font-weight:900}.login-logo h1 span{color:#7c3aed}
+.login-logo p{color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}
+.lg{margin-bottom:16px}.ll{font-size:12px;font-weight:800;color:var(--black);margin-bottom:5px;display:block}
+.li{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;font-weight:600;outline:none;transition:border .2s}
+.li:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.lbtn{width:100%;background:linear-gradient(135deg,var(--purple),var(--purple-light));color:#fff;font-size:15px;font-weight:900;padding:14px;border:none;border-radius:50px;cursor:pointer;margin-top:6px;font-family:'Nunito',sans-serif;transition:background .2s}
+.lbtn:hover{background:linear-gradient(135deg,var(--purple-dark),var(--purple));transform:translateY(-1px);box-shadow:0 8px 20px rgba(124,58,237,.4)}
+.lerr{color:#ef4444;font-size:12px;font-weight:700;text-align:center;margin-top:8px;display:none}
+
+/* LAYOUT */
+.app{display:none;min-height:100vh}.app.active{display:flex}
+.sidebar{width:var(--sw);background:linear-gradient(180deg,#0d0d14 0%,#130b22 100%);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .3s}
+.sb-logo{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo h2{font-size:17px;font-weight:900}.sb-logo h2 span{color:#a855f7}
+.sb-logo p{font-size:10px;color:#888;margin-top:2px;font-weight:600}
+.sb-nav{flex:1;padding:14px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:11px;padding:12px 18px;cursor:pointer;font-size:13px;font-weight:700;color:#aaa;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-item.active{background:rgba(124,58,237,.12);color:var(--purple);border-left-color:var(--purple)}
+.nav-ico{font-size:17px;width:22px;text-align:center}
+.sb-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08)}
+.lout-btn{width:100%;background:rgba(255,255,255,.07);color:#aaa;border:none;padding:10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
+.lout-btn:hover{background:rgba(239,68,68,.15);color:#ef4444}
+
+/* MAIN */
+.main{flex:1;margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;transition:margin .3s}
+.topbar{background:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(124,58,237,.1);position:sticky;top:0;z-index:100}
+.topbar-title{font-size:17px;font-weight:900}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.live-badge{background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:800;padding:5px 12px;border-radius:20px;display:flex;align-items:center;gap:5px}
+.live-dot{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hamburger{background:none;border:none;cursor:pointer;font-size:21px;color:var(--black);display:none}
+.content{padding:22px;flex:1}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 10px rgba(0,0,0,.05);border-top:3px solid var(--border);transition:transform .2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-card.orange{border-top-color:#7c3aed}.stat-card.blue{border-top-color:#3b82f6}
+.stat-card.yellow{border-top-color:#f59e0b}.stat-card.green{border-top-color:#22c55e}
+.stat-card.purple{border-top-color:#8b5cf6}.stat-card.teal{border-top-color:#14b8a6}
+.stat-lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-val{font-size:26px;font-weight:900}.stat-ico{font-size:26px;margin-bottom:7px}
+
+/* LIVE VISITORS CARD */
+.live-visitors-card{background:linear-gradient(135deg,#0d0d14,#1a0d2e);border-radius:14px;padding:18px;margin-bottom:24px;display:flex;align-items:center;gap:16px}
+.lv-icon{font-size:36px}.lv-info{flex:1}
+.lv-title{color:#aaa;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.lv-count{color:#fff;font-size:32px;font-weight:900;line-height:1}
+.lv-sub{color:#888;font-size:12px;font-weight:600;margin-top:3px}
+.lv-chart{display:flex;align-items:flex-end;gap:3px;height:36px}
+.lv-bar{width:8px;background:linear-gradient(180deg,#a855f7,#7c3aed);border-radius:2px 2px 0 0;opacity:.7;transition:height .5s}
+
+/* SEC HDR */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.sec-hdr h2{font-size:17px;font-weight:900}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;border:none;font-family:'Nunito',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.btn-orange{background:linear-gradient(135deg,var(--purple),var(--purple-light));color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.3)}.btn-orange:hover{background:linear-gradient(135deg,var(--purple-dark),var(--purple));box-shadow:0 6px 20px rgba(124,58,237,.45)}
+.btn-out{background:#fff;color:var(--black);border:2px solid var(--border)}.btn-out:hover{border-color:#7c3aed;color:#7c3aed;background:#faf5ff}
+.btn-red{background:#fef2f2;color:#ef4444;border:1px solid #fecaca}.btn-red:hover{background:#ef4444;color:#fff}
+.btn-sm{padding:5px 12px;font-size:11px}
+
+/* TABLE */
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:680px}
+th{background:#f9f9f9;padding:11px 13px;text-align:left;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 13px;font-size:12px;font-weight:600;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf5ff}
+
+/* FILTERS */
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.fi{padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:12px;font-family:'Nunito',sans-serif;font-weight:600;outline:none;transition:border .2s}
+.fi:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+.b-new{background:#fff7ed;color:#ea580c}.b-confirmed{background:#eff6ff;color:#3b82f6}
+.b-shipped{background:#fef9c3;color:#ca8a04}.b-delivered{background:#f0fdf4;color:#16a34a}
+.b-cancelled{background:#fef2f2;color:#dc2626}
+
+.st-sel{padding:5px 9px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:'Nunito',sans-serif;font-weight:700;outline:none;cursor:pointer;background:#fff;color:var(--text)}
+
+/* PRODUCTS GRID */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.prod-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.prod-img{width:100%;height:160px;object-fit:cover;border-radius:10px;margin-bottom:12px;background:var(--gray)}
+.prod-name{font-size:14px;font-weight:800;margin-bottom:5px}
+.prod-price{color:#7c3aed;font-size:17px;font-weight:900;margin-bottom:3px}
+.prod-mrp{color:var(--muted);font-size:12px;text-decoration:line-through;font-weight:600;margin-bottom:7px}
+.prod-stock{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.prod-active{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;margin-bottom:10px}
+.pa-yes{background:#f0fdf4;color:#16a34a}.pa-no{background:#fef2f2;color:#dc2626}
+.prod-acts{display:flex;gap:7px}
+
+/* MODAL */
+.m-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px)}
+.m-overlay.active{display:flex}
+.m-box{background:#fff;border-radius:18px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;padding:28px 24px}
+.m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.m-head h3{font-size:17px;font-weight:900}
+.m-close{background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;line-height:1}
+.fg{margin-bottom:14px}
+.fl{font-size:11px;font-weight:800;color:var(--black);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.3px}
+.finput{width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:600;outline:none;transition:border .2s;color:var(--text)}
+.finput:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+textarea.finput{min-height:72px;resize:vertical}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* MULTI-IMAGE INPUT */
+.img-section{margin-bottom:14px}
+.img-inputs{display:flex;flex-direction:column;gap:8px}
+.img-input-row{display:flex;align-items:center;gap:8px}
+.img-input-row input{flex:1;padding:9px 12px;border:2px solid var(--border);border-radius:8px;font-size:12px;font-family:'Nunito',sans-serif;font-weight:600;outline:none;transition:border .2s;color:var(--text)}
+.img-input-row input:focus{border-color:#7c3aed}
+.img-rm-btn{background:#fef2f2;color:#ef4444;border:none;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:15px;flex-shrink:0;font-family:'Nunito',sans-serif}
+.img-add-btn{background:#faf5ff;color:#7c3aed;border:1px solid #d8b4fe;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:4px;display:inline-flex;align-items:center;gap:5px}
+.img-preview-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.img-preview{width:52px;height:52px;object-fit:cover;border-radius:8px;border:2px solid var(--border)}
+
+/* TOGGLE */
+.tog-wrap{display:flex;align-items:center;gap:10px}
+.tog{position:relative;width:44px;height:22px}
+.tog input{opacity:0;width:0;height:0}
+.tog-sl{position:absolute;inset:0;background:#ddd;border-radius:22px;cursor:pointer;transition:background .2s}
+.tog-sl::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s}
+.tog input:checked + .tog-sl{background:linear-gradient(135deg,#7c3aed,#a855f7)}
+.tog input:checked + .tog-sl::before{transform:translateX(22px)}
+
+/* SETTINGS */
+.set-card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);max-width:580px;margin-bottom:18px}
+.set-card h3{font-size:15px;font-weight:900;margin-bottom:5px}
+.set-card p{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:16px}
+.px-current{background:#faf5ff;border:1px solid #d8b4fe;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;font-weight:700;color:#7c3aed}
+.ev-list{background:var(--gray);border-radius:9px;padding:12px 14px;margin-top:10px}
+.ev-list p{font-size:11px;font-weight:800;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.4px}
+.ev-item{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:12px;font-weight:700}
+.ev-dot{width:7px;height:7px;background:#7c3aed;border-radius:50%}
+
+
+/* DUPLICATE CLEANER BANNER */
+.dup-banner{background:linear-gradient(135deg,#fef2f2,#fff5f5);border:2px solid #fecaca;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:none;align-items:center;gap:14px;flex-wrap:wrap}
+.dup-banner.show{display:flex}
+.dup-banner-txt{flex:1;font-size:13px;font-weight:700;color:#dc2626}
+.dup-banner-txt span{font-size:20px;margin-right:6px}
+.btn-clean{background:#dc2626;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;white-space:nowrap}
+.btn-clean:hover{background:#b91c1c}
+
+/* NOTIFICATION BELL */
+.notif-bell{position:relative;cursor:pointer;font-size:20px;padding:5px;border-radius:8px;transition:background .2s;display:flex;align-items:center}
+.notif-bell:hover{background:rgba(0,0,0,.05)}
+.notif-dot{position:absolute;top:2px;right:2px;width:9px;height:9px;background:#ef4444;border-radius:50%;border:2px solid #fff;display:none}
+.notif-dot.show{display:block;animation:notifpop .4s ease}
+@keyframes notifpop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* SOUND TOGGLE */
+.sound-tog{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:#fff;transition:all .2s}
+.sound-tog:hover{border-color:#7c3aed;color:#7c3aed}
+.sound-tog.on{background:#faf5ff;color:#7c3aed;border-color:#a855f7}
+
+/* SELLOSHIP TAB */
+.sell-card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.05);max-width:640px;margin-bottom:18px}
+.sell-card h3{font-size:15px;font-weight:900;margin-bottom:5px}
+.sell-card p{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:16px;line-height:1.7}
+.sell-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:6px 14px;border-radius:20px;margin-bottom:14px}
+.sell-status.connected{background:#f0fdf4;color:#16a34a}
+.sell-status.disconnected{background:#fef2f2;color:#dc2626}
+.sell-orders-list{background:var(--gray);border-radius:10px;padding:14px;margin-top:14px}
+.sell-order-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;font-weight:600}
+.sell-order-row:last-child{border-bottom:none}
+.sell-order-row b{color:var(--black)}
+.sell-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px}
+.sb-pending{background:#fff7ed;color:#ea580c}
+.sb-synced{background:#f0fdf4;color:#16a34a}
+.sb-failed{background:#fef2f2;color:#dc2626}
+
+
+/* SOUND PICKER MODAL */
+.snd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(4px)}
+.snd-overlay.active{display:flex}
+.snd-box{background:#fff;border-radius:20px;width:100%;max-width:480px;padding:26px 22px;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.snd-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.snd-head h3{font-size:16px;font-weight:900}
+.snd-sub{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:18px}
+.snd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.snd-card{border:2px solid var(--border);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;position:relative}
+.snd-card:hover{border-color:#7c3aed;background:#faf5ff}
+.snd-card.selected{border-color:#7c3aed;background:#faf5ff}
+.snd-card.selected::after{content:'✓';position:absolute;top:6px;right:8px;font-size:11px;font-weight:900;color:#7c3aed}
+.snd-ico{font-size:22px;flex-shrink:0}
+.snd-name{font-size:12px;font-weight:800;color:var(--black)}
+.snd-desc{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
+.snd-preview{background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--muted);transition:all .2s;margin-top:5px;display:inline-block}
+.snd-preview:hover{border-color:#7c3aed;color:#7c3aed}
+.snd-vol-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;background:var(--gray);border-radius:10px;padding:12px 14px}
+.snd-vol-row label{font-size:12px;font-weight:800;flex-shrink:0}
+.snd-vol-row input[type=range]{flex:1;accent-color:#7c3aed}
+.snd-vol-val{font-size:12px;font-weight:800;color:#7c3aed;width:32px;text-align:right}
+
+
+/* ADDRESS SCORE BADGE */
+.score-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;white-space:nowrap}
+.score-hi{background:#f0fdf4;color:#16a34a}
+.score-md{background:#fefce8;color:#92400e}
+.score-lo{background:#fef2f2;color:#dc2626}
+.score-dots{display:inline-flex;gap:2px;margin-left:2px}
+.score-dot{width:5px;height:5px;border-radius:50%;background:#ddd}
+.score-dot.on{background:currentColor}
+
+/* ORDER TIME */
+.order-time{font-size:10px;color:var(--muted);font-weight:600;white-space:nowrap}
+.time-hi{color:#16a34a;font-weight:800}
+.time-pm{color:#a855f7;font-weight:800}
+
+/* AI FIX BUTTON */
+.btn-ai{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:3px}
+.btn-ai:hover{opacity:.85}
+.btn-ai:disabled{opacity:.5;cursor:not-allowed}
+
+/* DASHBOARD EXTRA STATS ROW */
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.ins-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);text-align:center}
+.ins-ico{font-size:24px;margin-bottom:6px}
+.ins-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.ins-val{font-size:22px;font-weight:900;color:var(--black)}
+.ins-sub{font-size:10px;font-weight:600;color:var(--muted);margin-top:3px}
+
+/* JUNK CLEAN */
+.junk-card{background:linear-gradient(135deg,#0d0d14,#1a0d2e);border-radius:14px;padding:20px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.junk-info{flex:1;min-width:180px}
+.junk-info h3{color:#fff;font-size:14px;font-weight:900;margin-bottom:4px}
+.junk-info p{color:#888;font-size:11px;font-weight:600;line-height:1.6}
+.btn-junk{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;white-space:nowrap}
+.btn-junk:hover{background:#5b21b6;box-shadow:0 4px 14px rgba(124,58,237,.4)}
+.junk-result{background:#0a0a12;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:11px;font-weight:700;color:#22c55e;display:none;width:100%;line-height:1.8}
+
+/* DATE FILTER */
+.date-filter-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.date-filter-row label{font-size:11px;font-weight:800;color:var(--muted)}
+
+/* DASHBOARD DATE FILTER */
+.dash-date-filter{display:flex;gap:9px;flex-wrap:wrap;align-items:center;background:#fff;border-radius:12px;padding:10px 16px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:16px;border-left:3px solid #7c3aed}
+.dash-date-filter label{font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
+.dash-date-filter .fi{padding:6px 10px;font-size:12px;border-radius:8px;border:1.5px solid #e5e7eb;font-weight:700;font-family:'Nunito',sans-serif;color:#222;background:#fafafa;outline:none;cursor:pointer}
+.dash-date-filter .fi:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.dash-date-filter .ddf-presets{display:flex;gap:6px;flex-wrap:wrap}
+.dash-date-filter .ddf-btn{background:#f5f5f5;color:#444;border:1.5px solid #e5e7eb;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .15s;white-space:nowrap}
+.dash-date-filter .ddf-btn:hover,.dash-date-filter .ddf-btn.active{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-color:#7c3aed}
+.dash-date-filter .ddf-clear{background:transparent;color:var(--muted);border:1.5px solid #e5e7eb;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .15s}
+.dash-date-filter .ddf-clear:hover{background:#fee2e2;color:#dc2626;border-color:#fca5a5}
+.dash-stats-label{font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px;margin-top:2px;padding-left:2px}
+
+/* CONVERSION WIDGET */
+.conv-bar-wrap{height:8px;background:#f0f0f0;border-radius:4px;margin:8px 0;overflow:hidden}
+.conv-bar{height:100%;background:linear-gradient(90deg,var(--purple),#a855f7);border-radius:4px;transition:width .6s ease}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:linear-gradient(135deg,#1a0d2e,#0d0d14);border:1px solid rgba(124,58,237,.3);color:#fff;padding:11px 18px;border-radius:12px;font-size:12px;font-weight:700;z-index:2000;opacity:0;transition:all .3s;pointer-events:none;max-width:300px}
+.toast.show{opacity:1}.toast.success{background:#16a34a}.toast.error{background:#dc2626}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;font-weight:700}
+.empty span{display:block;font-size:36px;margin-bottom:8px}
+
+/* TESTIMONIAL CARDS */
+.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:18px}
+.test-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.05);border-left:4px solid #7c3aed}
+.test-card-vid{border-left-color:#8b5cf6}
+.test-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.test-av{width:40px;height:40px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-radius:50%;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.test-av-vid{background:#8b5cf6}
+.test-name{font-size:13px;font-weight:800}
+.test-loc{font-size:11px;color:var(--muted);font-weight:600}
+.test-stars{color:#f59e0b;font-size:12px;margin-bottom:5px}
+.test-review{font-size:12px;color:#555;line-height:1.6;margin-bottom:8px}
+.test-vid-tag{font-size:10px;font-weight:800;color:#8b5cf6;background:#f5f3ff;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.test-thumb{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;cursor:pointer}
+.test-acts{display:flex;gap:8px}
+
+/* ORDERS SUB-TABS */
+.orders-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
+.order-tab-btn{padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;font-family:'Nunito',sans-serif;transition:all .2s}
+.order-tab-btn.active{color:#7c3aed;border-bottom-color:#7c3aed}
+.order-tab-btn:hover{color:#7c3aed}
+
+/* AVG ORDER TIME CARD */
+.avg-time-card{background:linear-gradient(135deg,#faf5ff,#fff);border:2px solid #d8b4fe;border-radius:14px;padding:16px;margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.avg-time-info h3{font-size:14px;font-weight:900;margin-bottom:3px}
+.avg-time-info p{font-size:11px;color:var(--muted);font-weight:600}
+.avg-time-val{font-size:28px;font-weight:900;color:#7c3aed}
+.avg-time-sub{font-size:11px;color:var(--muted);font-weight:600}
+
+/* AUTOREFRESH BUTTON */
+.autorefresh-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;border:2px solid var(--border);background:#fff;color:var(--muted);font-family:'Nunito',sans-serif;transition:all .2s}
+.autorefresh-btn.active{border-color:#22c55e;color:#16a34a;background:#f0fdf4}
+.autorefresh-btn .spin{display:none}
+.autorefresh-btn.active .spin{display:inline-block;animation:spin360 1s linear infinite}
+@keyframes spin360{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* TESTIMONIAL MODAL */
+.test-form-section{margin-bottom:16px}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}.hamburger{display:block}
+  .stats-grid{grid-template-columns:1fr 1fr}.fr2{grid-template-columns:1fr}
+}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr}.content{padding:14px}}
+
+/* ═══ SLIMAURA ADMIN PURPLE POLISH ═══ */
+*{scroll-behavior:smooth}
+
+/* Body purple tint */
+body{background:linear-gradient(180deg,#f5f0ff 0%,#f7f8fa 6%)}
+
+/* Login page */
+.login-page{background:linear-gradient(135deg,#0d0d14 0%,#1a0d2e 50%,#0d0d14 100%)!important}
+.login-page::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 30% 40%,rgba(124,58,237,.15) 0%,transparent 60%),radial-gradient(circle at 70% 70%,rgba(168,85,247,.1) 0%,transparent 50%);pointer-events:none}
+.login-card{box-shadow:0 30px 80px rgba(0,0,0,.4),0 0 0 1px rgba(124,58,237,.15)!important;border-top:4px solid #7c3aed!important}
+.login-logo h1{color:#0d0d14}
+.lbtn{transition:all .25s cubic-bezier(.4,0,.2,1)!important}
+
+/* Sidebar */
+.sidebar{border-right:1px solid rgba(124,58,237,.15)}
+.sb-logo{border-bottom:1px solid rgba(124,58,237,.15)!important}
+.sb-logo h2{color:#fff;letter-spacing:.5px}
+.sb-foot{border-top:1px solid rgba(124,58,237,.15)!important}
+.nav-item{transition:all .2s cubic-bezier(.4,0,.2,1)}
+.nav-item:hover{background:rgba(124,58,237,.1)!important;color:#c4b5fd!important}
+.nav-item.active{background:rgba(124,58,237,.2)!important;color:#c4b5fd!important;border-left-color:#a855f7!important}
+.nav-ico{transition:transform .2s}
+.nav-item:hover .nav-ico{transform:scale(1.15)}
+
+/* Topbar glass */
+.topbar{background:rgba(255,255,255,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(124,58,237,.1)!important}
+
+/* Stat cards */
+.stat-card{transition:all .25s cubic-bezier(.4,0,.2,1)!important;border-top-width:3px!important}
+.stat-card:hover{transform:translateY(-4px)!important;box-shadow:0 8px 24px rgba(124,58,237,.12)!important}
+.stat-card.orange{border-top-color:#7c3aed!important;background:linear-gradient(180deg,#faf5ff 0%,#fff 100%)}
+
+/* Live visitors card */
+.live-visitors-card{background:linear-gradient(135deg,#0d0d14,#1a0d2e)!important;border:1px solid rgba(124,58,237,.2);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.lv-title{color:#a855f7!important}
+.lv-count{color:#e9d5ff!important}
+
+/* Table */
+th{background:linear-gradient(180deg,#faf5ff,#f5f0ff)!important;color:#6d28d9!important}
+tr:hover td{background:#faf5ff!important}
+.card{border:1px solid rgba(124,58,237,.08)}
+
+/* Buttons */
+.btn{transition:all .2s cubic-bezier(.4,0,.2,1)}
+.btn-orange{background:linear-gradient(135deg,#7c3aed,#a855f7)!important;box-shadow:0 4px 14px rgba(124,58,237,.3)!important}
+.btn-orange:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(124,58,237,.45)!important}
+
+/* Order status badges - keep their own colors */
+.b-new{background:#faf5ff!important;color:#7c3aed!important;border:1px solid #d8b4fe}
+
+/* Order tabs */
+.order-tab-btn.active{color:#7c3aed!important;border-bottom-color:#7c3aed!important}
+.order-tab-btn:hover{color:#7c3aed!important}
+
+/* Dash date filter */
+.dash-date-filter{border-left:3px solid #7c3aed!important;background:linear-gradient(180deg,#faf5ff,#fff)!important}
+
+/* Modal */
+.m-box{border:1px solid rgba(124,58,237,.1);box-shadow:0 30px 80px rgba(0,0,0,.35),0 0 0 1px rgba(124,58,237,.08)}
+.m-head h3{color:#0d0d14}
+
+/* Product cards */
+.prod-card{transition:all .25s;border:1px solid rgba(124,58,237,.08)}
+.prod-card:hover{box-shadow:0 8px 24px rgba(124,58,237,.12);transform:translateY(-2px)}
+
+/* Testimonial cards */
+.test-card{transition:all .25s}
+.test-card:hover{box-shadow:0 8px 24px rgba(124,58,237,.12);transform:translateY(-2px)}
+
+/* Toast */
+.toast.success{background:linear-gradient(135deg,#14532d,#166534)!important}
+.toast.error{background:linear-gradient(135deg,#7f1d1d,#991b1b)!important}
+
+/* Settings cards */
+.set-card{border:1px solid rgba(124,58,237,.08)}
+.set-card:hover{box-shadow:0 4px 16px rgba(124,58,237,.08)}
+
+/* Sell cards */
+.sell-card{border:1px solid rgba(124,58,237,.08)}
+
+/* Toggle */
+.tog-sl{transition:background .25s,box-shadow .25s}
+.tog input:checked + .tog-sl{box-shadow:0 0 10px rgba(124,58,237,.4)}
+
+/* Section headers */
+.sec-hdr h2{color:#0d0d14}
+
+/* Conversion bar */
+.conv-bar{background:linear-gradient(90deg,#7c3aed,#a855f7)!important}
+
+/* Autorefresh active */
+.autorefresh-btn.active{border-color:#7c3aed!important;color:#7c3aed!important;background:#faf5ff!important}
+
+/* Score badges */
+.score-hi{background:#f0fdf4;color:#16a34a}
+
+/* Avg-time card */
+.avg-time-card{background:linear-gradient(135deg,#faf5ff,#fff)!important;border:2px solid #d8b4fe!important}
+
+/* Junk card */
+.junk-card{background:linear-gradient(135deg,#0d0d14,#1a0d2e)!important;border:1px solid rgba(124,58,237,.2)}
+
+/* Dup banner */
+.dup-banner{border-color:#fecaca}
+
+/* Sound picker */
+.snd-box{border-top:4px solid #7c3aed}
+
+/* Smooth transitions on all interactive */
+button,input,select,textarea,.nav-item,.stat-card,.prod-card,.test-card,.set-card,.sell-card{transition:all .2s cubic-bezier(.4,0,.2,1)}
+
+/* Section title accent */
+.topbar-title::after{content:'';display:inline-block;width:6px;height:6px;background:#7c3aed;border-radius:50%;margin-left:8px;vertical-align:middle;opacity:.7}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo"><h1>SLIM<span>AURA</span></h1><p>Admin Dashboard</p></div>
+    <div class="lg"><label class="ll">Username</label><input class="li" id="lUser" type="text" value="admin"/></div>
+    <div class="lg"><label class="ll">Password</label><input class="li" id="lPass" type="password" placeholder="Password"/></div>
+    <button class="lbtn" onclick="doLogin()">Login →</button>
+    <div class="lerr" id="lErr">Invalid credentials. Please try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appLayout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo"><h2>SLIM<span>AURA</span></h2><p>Admin Panel</p></div>
+    <nav class="sb-nav">
+      <div class="nav-item active" onclick="showTab('dashboard')"><span class="nav-ico">📊</span>Dashboard</div>
+      <div class="nav-item" onclick="showTab('orders')"><span class="nav-ico">📦</span>Orders</div>
+      <div class="nav-item" onclick="showTab('shipped')"><span class="nav-ico">🚚</span>Shipped Orders</div>
+      <div class="nav-item" onclick="showTab('products')"><span class="nav-ico">🛍️</span>Products</div>
+      <div class="nav-item" onclick="showTab('testimonials')"><span class="nav-ico">⭐</span>Testimonials</div>
+      <div class="nav-item" onclick="showTab('settings')"><span class="nav-ico">⚙️</span>Settings</div>
+      <div class="nav-item" onclick="showTab('selloship')"><span class="nav-ico">📬</span>Selloship</div>
+    </nav>
+    <div class="sb-foot"><button class="lout-btn" onclick="doLogout()">🚪 Logout</button></div>
+  </aside>
+
+  <main class="main" id="mainArea">
+    <div class="topbar">
+      <button class="hamburger" onclick="toggleSB()">☰</button>
+      <div class="topbar-title" id="topTitle">Dashboard</div>
+      <div class="topbar-right">
+        <button class="sound-tog on" id="soundTogBtn" onclick="openSoundPicker()" title="Choose notification sound">🔔 Sound: <span id="soundLabel">Ding</span></button>
+        <div class="notif-bell" title="New order notification"><span>🔔</span><div class="notif-dot" id="notifDot"></div></div>
+        <div class="live-badge"><div class="live-dot"></div><span id="liveVisitors">—</span> Live</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="tab-dashboard">
+        <!-- Live Visitors Card -->
+        <div class="live-visitors-card">
+          <div class="lv-icon">👁️</div>
+          <div class="lv-info">
+            <div class="lv-title">Live Visitors on Store Right Now</div>
+            <div class="lv-count" id="lvCount">—</div>
+            <div class="lv-sub">Visitors currently browsing your product page</div>
+          </div>
+          <div class="lv-chart" id="lvChart"></div>
+        </div>
+
+        <!-- DASHBOARD DATE FILTER -->
+        <div class="dash-date-filter">
+          <span style="font-size:16px">📅</span>
+          <label>From:</label>
+          <input class="fi" type="date" id="dashDateFrom" onchange="updateDashboardStats()"/>
+          <label>To:</label>
+          <input class="fi" type="date" id="dashDateTo" onchange="updateDashboardStats()"/>
+          <div class="ddf-presets">
+            <button class="ddf-btn" id="ddf-today" onclick="setDashPreset('today')">Today</button>
+            <button class="ddf-btn" id="ddf-week" onclick="setDashPreset('week')">This Week</button>
+            <button class="ddf-btn" id="ddf-month" onclick="setDashPreset('month')">This Month</button>
+            <button class="ddf-btn" id="ddf-all" onclick="setDashPreset('all')">All Time</button>
+          </div>
+          <button class="ddf-clear" onclick="clearDashFilter()">✕ Clear</button>
+        </div>
+        <div class="dash-stats-label" id="dashStatsLabel"></div>
+
+        <div class="stats-grid">
+          <div class="stat-card orange"><div class="stat-ico">📦</div><div class="stat-lbl">Total Orders</div><div class="stat-val" id="st-total">—</div></div>
+          <div class="stat-card blue"><div class="stat-ico">🆕</div><div class="stat-lbl">New Orders</div><div class="stat-val" id="st-new">—</div></div>
+          <div class="stat-card yellow"><div class="stat-ico">✅</div><div class="stat-lbl">Confirmed</div><div class="stat-val" id="st-confirmed">—</div></div>
+          <div class="stat-card green"><div class="stat-ico">🚚</div><div class="stat-lbl">Shipped</div><div class="stat-val" id="st-shipped">—</div></div>
+          <div class="stat-card purple"><div class="stat-ico">💰</div><div class="stat-lbl">Revenue</div><div class="stat-val" id="st-revenue">—</div></div>
+        </div>
+
+        <!-- INSIGHTS ROW -->
+        <div class="insights-grid">
+          <div class="ins-card">
+            <div class="ins-ico">⏱️</div>
+            <div class="ins-lbl">Avg Between Orders</div>
+            <div class="ins-val" id="ins-avgtime">—</div>
+            <div class="ins-sub" id="ins-avgtime-sub">avg gap between orders</div>
+          </div>
+          <div class="ins-card">
+            <div class="ins-ico">🕛</div>
+            <div class="ins-lbl">Peak Order Hour</div>
+            <div class="ins-val" id="ins-peakhour">—</div>
+            <div class="ins-sub" id="ins-peakhour-sub">busiest hour of day</div>
+          </div>
+          <div class="ins-card">
+            <div class="ins-ico">🌙</div>
+            <div class="ins-lbl">After 12 PM Orders</div>
+            <div class="ins-val" id="ins-pm">—</div>
+            <div class="ins-sub" id="ins-pm-pct">of total orders</div>
+          </div>
+          <div class="ins-card">
+            <div class="ins-ico">📈</div>
+            <div class="ins-lbl">Conversion Rate</div>
+            <div class="ins-val" id="ins-conv">—</div>
+            <div class="conv-bar-wrap"><div class="conv-bar" id="convBar" style="width:0%"></div></div>
+            <div class="ins-sub">visitors → orders</div>
+          </div>
+          <div class="ins-card">
+            <div class="ins-ico">⭐</div>
+            <div class="ins-lbl">Avg Address Score</div>
+            <div class="ins-val" id="ins-adrscore">—</div>
+            <div class="ins-sub">delivery confidence</div>
+          </div>
+        </div>
+
+        <div class="sec-hdr"><h2>Latest Orders</h2><button class="btn btn-orange btn-sm" onclick="showTab('orders')">View All →</button></div>
+        <div class="card"><div class="tbl-wrap">
+          <table><thead><tr><th>Name</th><th>Phone</th><th>City</th><th>Size</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="latestBody"><tr><td colspan="7"><div class="empty"><span>⏳</span>Loading...</div></td></tr></tbody></table>
+        </div></div>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="tab-orders" style="display:none">
+        <div class="sec-hdr"><h2>All Orders</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="autorefresh-btn" id="autoRefreshBtn" onclick="toggleAutoRefresh()">
+              <span class="spin">🔄</span><span class="ar-ico">🔄</span> Auto Refresh
+            </button>
+            <button class="btn btn-out btn-sm" onclick="filterPM()">🌙 After 12PM</button>
+            <button class="btn btn-orange" onclick="exportCsvCurrentPage()">⬇️ Export CSV (This Page)</button>
+            <button class="btn btn-orange" onclick="openBulkShipModal()" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)" title="Bulk ship orders via Selloship">📦 Bulk Ship via Selloship</button>
+          </div>
+        </div>
+        <!-- Orders sub-tabs -->
+        <div class="orders-tabs">
+          <button class="order-tab-btn active" id="otab-active" onclick="switchOrderTab('active')">📦 Active Orders <span id="badge-active" style="background:var(--purple);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:4px">0</span></button>
+          <button class="order-tab-btn" id="otab-shipped" onclick="switchOrderTab('shipped')">🚚 Shipped <span id="badge-shipped" style="background:#f59e0b;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;margin-left:4px">0</span></button>
+        </div>
+        <div class="filters">
+          <input class="fi" id="srchInput" placeholder="🔍 Name, phone or #..." oninput="renderOrders()"/>
+          <select class="fi" id="stFilter" onchange="renderOrders()">
+            <option value="">All Status</option>
+            <option value="new">New</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="date-filter-row">
+          <label>📅 From:</label>
+          <input class="fi" type="date" id="dateFrom" style="width:auto;padding:7px 10px" onchange="renderOrders()"/>
+          <label>To:</label>
+          <input class="fi" type="date" id="dateTo" style="width:auto;padding:7px 10px" onchange="renderOrders()"/>
+          <button class="btn btn-out btn-sm" onclick="clearDateFilter()">✕ Clear</button>
+          <button class="btn btn-out btn-sm" onclick="setToday()">Today</button>
+        </div>
+        <!-- BULK SELLOSHIP SHIP BANNER -->
+        <div id="bulkShipBar" style="display:none;background:linear-gradient(135deg,#fff7ed,#fffbf5);border:2px solid #fed7aa;border-radius:12px;padding:12px 18px;margin-bottom:12px;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="font-size:16px">📦</span>
+          <div style="flex:1;font-size:13px;font-weight:700;color:#9a3412"><span id="bulkSelCount">0</span> orders selected for bulk shipping</div>
+          <button class="btn btn-orange" onclick="bulkShipSelected()" id="bulkShipBtn">🚚 Ship Selected via Selloship</button>
+          <button class="btn btn-out btn-sm" onclick="clearBulkSelection()">✕ Clear</button>
+        </div>
+        <div class="dup-banner" id="dupBanner">
+          <span>⚠️</span>
+          <div class="dup-banner-txt"><span id="dupCount">0</span> duplicate orders found (same phone number). Keep the latest, delete the rest.</div>
+          <button class="btn-clean" onclick="clearDuplicates()">🧹 Clear Duplicates</button>
+        </div>
+        <div class="card"><div class="tbl-wrap">
+          <table><thead><tr><th><input type="checkbox" id="selectAllChk" onclick="toggleSelectAll(this)" title="Select all"/></th><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Size</th><th>Qty</th><th>Amount</th><th>Score</th><th>Status</th><th>Date & Time</th><th>Actions</th></tr></thead>
+          <tbody id="ordersBody"><tr><td colspan="12"><div class="empty"><span>⏳</span>Loading...</div></td></tr></tbody></table>
+        </div></div>
+        <div id="paginationRow" style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap"></div>
+      </div>
+
+      <!-- SHIPPED ORDERS TAB -->
+      <div id="tab-shipped" style="display:none">
+        <div class="sec-hdr"><h2>🚚 Shipped Orders</h2>
+          <button class="btn btn-orange" onclick="exportCsvCurrentPage('shipped')">⬇️ Export CSV (Shipped)</button>
+        </div>
+        <div class="filters">
+          <input class="fi" id="srchShipped" placeholder="🔍 Name, phone..." oninput="renderShipped()"/>
+        </div>
+        <div class="date-filter-row">
+          <label>📅 From:</label>
+          <input class="fi" type="date" id="shippedDateFrom" style="width:auto;padding:7px 10px" onchange="renderShipped()"/>
+          <label>To:</label>
+          <input class="fi" type="date" id="shippedDateTo" style="width:auto;padding:7px 10px" onchange="renderShipped()"/>
+          <button class="btn btn-out btn-sm" onclick="document.getElementById('shippedDateFrom').value='';document.getElementById('shippedDateTo').value='';renderShipped()">✕ Clear</button>
+        </div>
+        <div class="card"><div class="tbl-wrap">
+          <table><thead><tr><th>#</th><th>Name</th><th>Phone</th><th>City</th><th>Address</th><th>Size</th><th>Qty</th><th>Amount</th><th>AWB / Tracking</th><th>Score</th><th>Shipped On</th><th>Actions</th></tr></thead>
+          <tbody id="shippedBody"><tr><td colspan="12"><div class="empty"><span>⏳</span>Loading...</div></td></tr></tbody></table>
+        </div></div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="tab-products" style="display:none">
+        <div class="sec-hdr"><h2>Products</h2><button class="btn btn-orange" onclick="openProdModal()">+ Add Product</button></div>
+        <div class="prod-grid" id="prodGrid"><div class="empty"><span>⏳</span>Loading...</div></div>
+      </div>
+
+      <!-- TESTIMONIALS -->
+      <div id="tab-testimonials" style="display:none">
+        <div class="sec-hdr">
+          <h2>⭐ Testimonials</h2>
+          <button class="btn btn-orange" onclick="openTestimonialModal()">+ Add Testimonial</button>
+        </div>
+        <div class="test-grid" id="testGrid">
+          <div class="empty"><span>⏳</span>Loading...</div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="tab-settings" style="display:none">
+        <div class="sec-hdr"><h2>Settings</h2></div>
+        <div class="set-card">
+          <h3>🎯 Meta Pixel (Facebook Ads)</h3>
+          <p>Enter your Facebook Pixel ID to track PageView, InitiateCheckout, and Purchase events on your store.</p>
+          <div id="curPixelWrap" style="display:none"><div class="px-current">✅ Active Pixel ID: <span id="curPixelId">—</span></div></div>
+          <div class="fg"><label class="fl">Pixel ID</label><input class="finput" id="pixelInput" placeholder="e.g. 1234567890123456"/></div>
+          <button class="btn btn-orange" onclick="savePixel()">💾 Save Pixel ID</button>
+          <div class="ev-list">
+            <p>Tracked Events</p>
+            <div class="ev-item"><div class="ev-dot"></div>PageView — on page load</div>
+            <div class="ev-item"><div class="ev-dot"></div>InitiateCheckout — when order form opens</div>
+            <div class="ev-item"><div class="ev-dot"></div>Purchase — on successful order with ₹ value</div>
+          </div>
+        </div>
+
+        <!-- OPENAI KEY -->
+        <div class="set-card">
+          <h3>🤖 OpenAI API Key (Address AI)</h3>
+          <p>Used to auto-fix & score delivery addresses using ChatGPT. Orders with messy addresses will get cleaned and scored for delivery confidence.</p>
+          <div class="fg"><label class="fl">OpenAI API Key</label><input class="finput" id="openaiKey" type="password" placeholder="sk-..."/></div>
+          <button class="btn btn-orange" onclick="saveOpenAiKey()">💾 Save Key</button>
+        </div>
+
+        <!-- SELLOSHIP SETTINGS -->
+        <div class="set-card" style="border-left:4px solid var(--purple)">
+          <h3>🚚 Selloship — Shipping Credentials</h3>
+          <p>Connect your Selloship account to ship orders directly from the Orders tab. Token is saved locally in your browser.</p>
+          <div class="sell-status disconnected" id="settSellStatus" style="margin-bottom:14px">🔴 Not Connected</div>
+          <div class="fr2">
+            <div class="fg"><label class="fl">Username / Email *</label><input class="finput" id="settSellUser" type="text" placeholder="your@email.com"/></div>
+            <div class="fg"><label class="fl">Password *</label><input class="finput" id="settSellPass" type="password" placeholder="Your Selloship password"/></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-orange" onclick="loginSelloshipFromSettings()">🔑 Connect Selloship</button>
+            <button class="btn btn-out btn-sm" onclick="clearSelloshipToken()" style="margin-left:auto">🗑️ Disconnect</button>
+          </div>
+          <div id="settTokenPreview" style="display:none;margin-top:10px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:700;color:#16a34a;word-break:break-all"></div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">📍 Pickup / Sender Address</div>
+            <div class="fr2" style="margin-bottom:10px">
+              <div class="fg" style="margin:0"><label class="fl">Full Name *</label><input class="finput" id="ssp-name" placeholder="RAVINDER SAINI"/></div>
+              <div class="fg" style="margin:0"><label class="fl">Phone *</label><input class="finput" id="ssp-phone" placeholder="9876543210"/></div>
+            </div>
+            <div class="fr2" style="margin-bottom:10px">
+              <div class="fg" style="margin:0"><label class="fl">City *</label><input class="finput" id="ssp-city" placeholder="Surat"/></div>
+              <div class="fg" style="margin:0"><label class="fl">State *</label><input class="finput" id="ssp-state" placeholder="Gujarat"/></div>
+            </div>
+            <div class="fr2" style="margin-bottom:10px">
+              <div class="fg" style="margin:0"><label class="fl">Pincode *</label><input class="finput" id="ssp-pin" placeholder="395009"/></div>
+              <div class="fg" style="margin:0"><label class="fl">Email</label><input class="finput" id="ssp-email" placeholder="email@example.com"/></div>
+            </div>
+            <div class="fg" style="margin-bottom:10px"><label class="fl">Address Line 1 *</label><input class="finput" id="ssp-addr1" placeholder="Plot No 40, Udhyog Vihar Phase 1"/></div>
+            <div class="fg"><label class="fl">Address Line 2</label><input class="finput" id="ssp-addr2" placeholder="(optional)"/></div>
+            <button class="btn btn-out" onclick="savePickupAddressFromSettings()">💾 Save Pickup Address</button>
+          </div>
+        </div>
+
+        <!-- JUNK CLEANER -->
+        <div class="junk-card">
+          <div class="junk-info">
+            <h3>🧹 Junk Cleaner</h3>
+            <p>Removes orphaned visitor sessions, trims whitespace & junk from order fields, and flushes stale in-memory data. Keeps your server lean and fast.</p>
+          </div>
+          <button class="btn-junk" onclick="runJunkClean()">🧹 Clean Now</button>
+          <div class="junk-result" id="junkResult"></div>
+        </div>
+      </div>
+
+      <!-- SELLOSHIP -->
+      <div id="tab-selloship" style="display:none">
+        <div class="sec-hdr"><h2>🚚 Selloship Integration</h2></div>
+
+        <!-- Step 1: Login -->
+        <div class="sell-card">
+          <h3>🔐 Step 1 — Login to Selloship</h3>
+          <p style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px">Enter your Selloship account credentials to get an auth token. Token is saved locally and reused automatically.</p>
+          <div class="sell-status disconnected" id="sellStatus">🔴 Not Connected</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div class="fg" style="margin:0"><label class="fl">Username / Email</label><input class="finput" id="sellUsername" type="text" placeholder="thevastrac@gmail.com"/></div>
+            <div class="fg" style="margin:0"><label class="fl">Password</label><input class="finput" id="sellPassword" type="password" placeholder="Your Selloship password"/></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-orange" onclick="loginSelloship()" id="sellLoginBtn">🔑 Login & Get Token</button>
+            <button class="btn btn-out" onclick="saveSelloshipCreds()">💾 Save Credentials</button>
+            <button class="btn btn-out btn-sm" onclick="clearSelloshipToken()" style="margin-left:auto">🗑️ Clear Token</button>
+          </div>
+          <div id="sellTokenPreview" style="display:none;margin-top:10px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:700;color:#16a34a;word-break:break-all"></div>
+        </div>
+
+        <!-- Pickup Address -->
+        <div class="sell-card">
+          <h3>📍 Step 2 — Pickup Address</h3>
+          <p style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px">This address is used as the sender/pickup address for all shipments.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="fg" style="margin:0"><label class="fl">Full Name *</label><input class="finput" id="sp-name" placeholder="RAVINDER SAINI"/></div>
+            <div class="fg" style="margin:0"><label class="fl">Phone *</label><input class="finput" id="sp-phone" placeholder="7016911360"/></div>
+            <div class="fg" style="margin:0"><label class="fl">Email</label><input class="finput" id="sp-email" placeholder="email@example.com"/></div>
+            <div class="fg" style="margin:0"><label class="fl">Pincode *</label><input class="finput" id="sp-pin" placeholder="395009"/></div>
+            <div class="fg" style="margin:0"><label class="fl">City *</label><input class="finput" id="sp-city" placeholder="Surat"/></div>
+            <div class="fg" style="margin:0"><label class="fl">State *</label><input class="finput" id="sp-state" placeholder="Gujarat"/></div>
+          </div>
+          <div class="fg" style="margin-top:10px"><label class="fl">Address Line 1 *</label><input class="finput" id="sp-addr1" placeholder="Plot No 40, Udhyog Vihar Phase 1"/></div>
+          <div class="fg"><label class="fl">Address Line 2</label><input class="finput" id="sp-addr2" placeholder="(optional)"/></div>
+          <button class="btn btn-out" onclick="savePickupAddress()" style="margin-top:4px">💾 Save Pickup Address</button>
+        </div>
+
+        <!-- Step 3: Create Shipments -->
+        <div class="sell-card">
+          <h3>📦 Step 3 — Create Shipments</h3>
+          <p style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px">Select orders to push to Selloship. Each order gets a waybill (AWB number) for tracking.</p>
+
+          <!-- Per-order dimensions defaults -->
+          <div style="background:var(--gray);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+            <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px">📐 DEFAULT PACKAGE DIMENSIONS</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+              <div style="display:flex;align-items:center;gap:6px"><label style="font-size:11px;font-weight:800">L (mm)</label><input class="finput" id="dim-l" style="width:70px;padding:6px 8px" value="100"/></div>
+              <div style="display:flex;align-items:center;gap:6px"><label style="font-size:11px;font-weight:800">B (mm)</label><input class="finput" id="dim-b" style="width:70px;padding:6px 8px" value="100"/></div>
+              <div style="display:flex;align-items:center;gap:6px"><label style="font-size:11px;font-weight:800">H (mm)</label><input class="finput" id="dim-h" style="width:70px;padding:6px 8px" value="100"/></div>
+              <div style="display:flex;align-items:center;gap:6px"><label style="font-size:11px;font-weight:800">Wt (g)</label><input class="finput" id="dim-w" style="width:70px;padding:6px 8px" value="500"/></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <button class="btn btn-orange" onclick="syncAllToSelloship()" id="sellSyncBtn">⬆️ Create Shipments for All New/Confirmed Orders</button>
+          </div>
+
+          <!-- Orders list for shipment -->
+          <div id="sellOrderList" style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;color:var(--muted);font-weight:600;text-align:center;padding:12px">Loading orders...</div>
+          </div>
+          <div class="sell-orders-list" id="sellSyncLog" style="margin-top:10px"></div>
+        </div>
+
+        <div class="sell-card" style="background:#fff8f5;border:1.5px solid #fde0cc">
+          <h3>ℹ️ How It Works</h3>
+          <p style="font-size:12px;color:#666;font-weight:600;line-height:1.8">
+            1. Enter your Selloship <b>username + password</b> and click <b>Login & Get Token</b><br>
+            2. Fill in your <b>Pickup Address</b> (warehouse/seller address)<br>
+            3. Click <b>Create Shipment</b> next to any order — waybill (AWB) is generated instantly<br>
+            4. Token is saved in your browser — re-login only when it expires
+          </p>
+        </div>
+      </div>
+
+    </div><!-- end .content -->
+  </main><!-- end .main -->
+</div><!-- end .app -->
+
+<!-- PRODUCT MODAL -->
+<div class="m-overlay" id="prodModal" onclick="prodOverlay(event)">
+  <div class="m-box">
+    <div class="m-head"><h3 id="prodModalTitle">Add Product</h3><button class="m-close" onclick="closeProdModal()">✕</button></div>
+    <div class="fg"><label class="fl">Product Name *</label><input class="finput" id="pm_name" placeholder="e.g. Sweat Belt Pro"/></div>
+    <div class="fg"><label class="fl">Description</label><textarea class="finput" id="pm_desc" placeholder="Product description..."></textarea></div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Price (₹) *</label><input class="finput" id="pm_price" type="number" placeholder="599"/></div>
+      <div class="fg"><label class="fl">MRP (₹)</label><input class="finput" id="pm_mrp" type="number" placeholder="1299"/></div>
+    </div>
+
+    <!-- MULTI IMAGE URLs -->
+    <div class="img-section">
+      <label class="fl">Product Images (URLs) — Add multiple, customers can swipe</label>
+      <div class="img-inputs" id="imgInputs"></div>
+      <button class="img-add-btn" onclick="addImageInput()">+ Add Another Image URL</button>
+      <div class="img-preview-row" id="imgPreviews"></div>
+    </div>
+
+    <div class="fg"><label class="fl">Benefits <span style="font-weight:600;text-transform:none;font-size:10px;color:#aaa">(comma separated)</span></label><input class="finput" id="pm_benefits" placeholder="Burns fat, Reduces inches, Supports back..."/></div>
+    <div class="fg"><label class="fl">Ingredients / Material</label><input class="finput" id="pm_ingredients" placeholder="Neoprene, Velcro..."/></div>
+    <div class="fg"><label class="fl">How to Use</label><textarea class="finput" id="pm_howToUse" placeholder="Wrap tightly around waist..."></textarea></div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Stock</label><input class="finput" id="pm_stock" type="number" placeholder="100"/></div>
+      <div class="fg"><label class="fl">Active</label>
+        <div class="tog-wrap" style="margin-top:8px">
+          <label class="tog"><input type="checkbox" id="pm_active" checked/><span class="tog-sl"></span></label>
+          <span style="font-size:13px;font-weight:700">Product Active</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-orange" style="width:100%;justify-content:center;padding:13px;font-size:14px" onclick="saveProd()">💾 Save Product</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://slimoraaas-xevr.onrender.com';
+
+let allOrders=[], allProducts=[], editingProdId=null, sbOpen=false;
+let liveVisitorCount=18, liveHistory=Array(8).fill(18);
+
+// ─── AUTH ──────────────────────────────────────────────────────────────────────
+function checkAuth() {
+  if (sessionStorage.getItem('sb_token')) {
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('appLayout').classList.add('active');
+    initApp();
+  }
+}
+async function doLogin() {
+  const u=document.getElementById('lUser').value.trim(), p=document.getElementById('lPass').value.trim();
+  if(!u||!p) return toast('Enter credentials','error');
+  try {
+    const r=await fetch(API+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(d.success){
+      sessionStorage.setItem('sb_token',d.token);
+      document.getElementById('loginPage').style.display='none';
+      document.getElementById('appLayout').classList.add('active');
+      document.getElementById('lErr').style.display='none';
+      initApp();
+    } else { document.getElementById('lErr').style.display='block'; }
+  } catch(e){ toast('Connection error. Check  URL.','error'); }
+}
+document.getElementById('lPass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+function doLogout(){ sessionStorage.removeItem('sb_token'); document.getElementById('loginPage').style.display='flex'; document.getElementById('appLayout').classList.remove('active'); }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function initApp(){ loadStats(); loadOrders(); loadProducts(); loadSettings(); loadSelloshipConfig(); loadTestimonials(); startLiveVisitors(); startAutoRefresh(); document.getElementById('ddf-all').classList.add('active'); initSettingsFields(); }
+
+// ─── LIVE VISITORS (Real API) ─────────────────────────────────────────────────
+async function fetchLiveVisitors() {
+  try {
+    const r = await fetch(API + '/api/visitors/count');
+    const d = await r.json();
+    if (d.success && typeof d.count === 'number') {
+      liveVisitorCount = d.count;
+    }
+  } catch(e) {}
+  liveHistory.push(liveVisitorCount);
+  liveHistory.shift();
+  updateLiveDisplay();
+}
+function startLiveVisitors() {
+  fetchLiveVisitors(); // immediate first load
+  setInterval(fetchLiveVisitors, 15000); // refresh every 15s
+}
+function updateLiveDisplay() {
+  document.getElementById('lvCount').textContent = liveVisitorCount;
+  document.getElementById('liveVisitors').textContent = liveVisitorCount;
+  const chart = document.getElementById('lvChart');
+  const max = Math.max(...liveHistory, 1);
+  chart.innerHTML = liveHistory.map(v =>
+    `<div class="lv-bar" style="height:${Math.round((v/max)*36)}px;opacity:${.4+.6*(v/max)}"></div>`
+  ).join('');
+}
+
+// ─── AUTO REFRESH STATS (10s, toggleable) ─────────────────────────────────────
+let autoRefreshInterval = null;
+let autoRefreshActive = false;
+
+function startAutoRefresh() {
+  // Start ON by default
+  enableAutoRefresh();
+}
+
+function enableAutoRefresh() {
+  if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+  autoRefreshInterval = setInterval(() => { loadStats(); loadOrders(); }, 10000);
+  autoRefreshActive = true;
+  const btn = document.getElementById('autoRefreshBtn');
+  if (btn) { btn.classList.add('active'); btn.querySelector('.ar-ico').textContent = '🔄'; }
+}
+
+function disableAutoRefresh() {
+  if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+  autoRefreshInterval = null;
+  autoRefreshActive = false;
+  const btn = document.getElementById('autoRefreshBtn');
+  if (btn) { btn.classList.remove('active'); btn.querySelector('.ar-ico').textContent = '🔄'; }
+}
+
+function toggleAutoRefresh() {
+  if (autoRefreshActive) {
+    disableAutoRefresh();
+    toast('Auto-refresh OFF', '');
+  } else {
+    enableAutoRefresh();
+    toast('Auto-refresh ON — every 10 seconds', 'success');
+  }
+}
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+function toggleSB(){ sbOpen=!sbOpen; document.getElementById('sidebar').classList.toggle('open',sbOpen); }
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+const tabTitles={dashboard:'Dashboard',orders:'Orders',shipped:'Shipped Orders',products:'Products',testimonials:'Testimonials',settings:'Settings',selloship:'Selloship'};
+const ALL_TABS=['dashboard','orders','shipped','products','testimonials','settings','selloship'];
+function showTab(name){
+  ALL_TABS.forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display=t===name?'block':'none';
+  });
+  document.querySelectorAll('.nav-item').forEach((el,i)=> el.classList.toggle('active',ALL_TABS[i]===name));
+  document.getElementById('topTitle').textContent=tabTitles[name]||name;
+  if(window.innerWidth<=768){ document.getElementById('sidebar').classList.remove('open'); sbOpen=false; }
+  if(name==='selloship') renderSelloshipOrders();
+  if(name==='shipped') renderShipped();
+  if(name==='testimonials') renderTestimonials();
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+async function loadStats(){
+  try{
+    // First load from API for initial all-time counts (fallback)
+    const r=await fetch(API+'/api/stats'); const d=await r.json();
+    if(d.success && !document.getElementById('dashDateFrom').value && !document.getElementById('dashDateTo').value){
+      document.getElementById('st-total').textContent=d.totalOrders;
+      document.getElementById('st-new').textContent=d.newOrders;
+      document.getElementById('st-confirmed').textContent=d.confirmedOrders;
+      document.getElementById('st-shipped').textContent=d.shippedOrders;
+      document.getElementById('st-revenue').textContent='₹'+(d.revenue||0).toLocaleString('en-IN');
+    }
+  }catch(e){}
+  updateDashboardStats();
+}
+
+// ─── DASHBOARD DATE FILTER ────────────────────────────────────────────────────
+let activeDashPreset = 'all';
+
+function getDashFilteredOrders() {
+  const from = document.getElementById('dashDateFrom').value;
+  const to   = document.getElementById('dashDateTo').value;
+  if (!from && !to) return allOrders;
+  return allOrders.filter(o => {
+    if (!o.createdAt) return false;
+    const od = new Date(o.createdAt); od.setHours(0,0,0,0);
+    if (from) { const f = new Date(from); f.setHours(0,0,0,0); if (od < f) return false; }
+    if (to)   { const t = new Date(to);   t.setHours(23,59,59,999); if (od > t) return false; }
+    return true;
+  });
+}
+
+function setDashPreset(preset) {
+  activeDashPreset = preset;
+  const today = new Date();
+  const toStr = today.toISOString().slice(0,10);
+  let fromStr = '';
+  if (preset === 'today') {
+    fromStr = toStr;
+  } else if (preset === 'week') {
+    const start = new Date(today); start.setDate(today.getDate() - today.getDay());
+    fromStr = start.toISOString().slice(0,10);
+  } else if (preset === 'month') {
+    fromStr = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0,10);
+  } else {
+    fromStr = ''; // all time
+  }
+  document.getElementById('dashDateFrom').value = fromStr;
+  document.getElementById('dashDateTo').value = preset === 'all' ? '' : toStr;
+  document.querySelectorAll('.ddf-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ddf-' + preset);
+  if (btn) btn.classList.add('active');
+  updateDashboardStats();
+}
+
+function clearDashFilter() {
+  document.getElementById('dashDateFrom').value = '';
+  document.getElementById('dashDateTo').value = '';
+  activeDashPreset = 'all';
+  document.querySelectorAll('.ddf-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('ddf-all').classList.add('active');
+  updateDashboardStats();
+}
+
+function updateDashboardStats() {
+  if (!allOrders.length) return;
+  const filtered = getDashFilteredOrders();
+  const from = document.getElementById('dashDateFrom').value;
+  const to   = document.getElementById('dashDateTo').value;
+
+  // Update stat cards from local filtered data
+  const total     = filtered.length;
+  const newO      = filtered.filter(o => o.status === 'new').length;
+  const confirmed = filtered.filter(o => o.status === 'confirmed').length;
+  const shipped   = filtered.filter(o => o.status === 'shipped').length;
+  const revenue   = filtered.reduce((s,o) => s + (parseFloat(o.amount)||0), 0);
+
+  document.getElementById('st-total').textContent     = total;
+  document.getElementById('st-new').textContent       = newO;
+  document.getElementById('st-confirmed').textContent = confirmed;
+  document.getElementById('st-shipped').textContent   = shipped;
+  document.getElementById('st-revenue').textContent   = '₹' + revenue.toLocaleString('en-IN');
+
+  // Update label
+  const lbl = document.getElementById('dashStatsLabel');
+  if (!from && !to) {
+    lbl.textContent = 'Showing all-time stats';
+  } else {
+    const parts = [];
+    if (from) parts.push('From: ' + from);
+    if (to)   parts.push('To: ' + to);
+    lbl.textContent = '📊 Filtered — ' + parts.join('  ·  ') + `  (${total} orders)`;
+  }
+
+  computeInsights(filtered);
+}
+
+function computeInsights(orders) {
+  const src = orders || allOrders;
+  if (!src.length) return;
+
+  // ── Avg time BETWEEN consecutive orders ──
+  const sorted = src.filter(o=>o.createdAt).map(o=>new Date(o.createdAt).getTime()).sort((a,b)=>a-b);
+  let avgIntervalStr = '—';
+  if (sorted.length >= 2) {
+    let totalGap = 0;
+    for (let i=1; i<sorted.length; i++) totalGap += sorted[i]-sorted[i-1];
+    const avgMs = totalGap/(sorted.length-1);
+    const avgMins = Math.round(avgMs/60000);
+    if (avgMins < 60) avgIntervalStr = avgMins + ' min';
+    else if (avgMins < 1440) avgIntervalStr = Math.round(avgMins/60) + ' hr';
+    else avgIntervalStr = Math.round(avgMins/1440) + ' days';
+  }
+  document.getElementById('ins-avgtime').textContent = avgIntervalStr;
+  const atSub = document.getElementById('ins-avgtime-sub');
+  if (atSub) atSub.textContent = 'avg gap between ' + src.length + ' orders';
+
+  // ── Peak order hour ──
+  const hourCounts = Array(24).fill(0);
+  src.forEach(o => { if(o.createdAt) hourCounts[new Date(o.createdAt).getHours()]++; });
+  const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+  const ph12 = peakHour%12||12, phAmpm = peakHour>=12?'PM':'AM';
+  const phEl = document.getElementById('ins-peakhour');
+  if (phEl) { phEl.textContent = ph12+':00 '+phAmpm; }
+  const phSub = document.getElementById('ins-peakhour-sub');
+  if (phSub) phSub.textContent = hourCounts[peakHour] + ' orders at peak';
+
+  // ── After 12PM orders ──
+  const pmOrders = src.filter(o => isAfterNoon(o.createdAt));
+  const pmPct = src.length ? Math.round(pmOrders.length/src.length*100) : 0;
+  document.getElementById('ins-pm').textContent = pmOrders.length;
+  document.getElementById('ins-pm-pct').textContent = pmPct + '% of filtered orders';
+
+  // ── Conversion rate ──
+  const visCount = liveVisitorCount || 1;
+  const todayOrders = src.filter(o => {
+    if (!o.createdAt) return false;
+    const od = new Date(o.createdAt); const now = new Date();
+    return od.toDateString() === now.toDateString();
+  }).length;
+  const convPct = visCount > 0 ? Math.min(Math.round(todayOrders/Math.max(visCount,1)*100),100) : 0;
+  document.getElementById('ins-conv').textContent = convPct + '%';
+  document.getElementById('convBar').style.width = convPct + '%';
+
+  // ── Avg address score ──
+  const avgScore = Math.round(src.reduce((s,o)=>s+scoreAddress(o),0)/src.length);
+  document.getElementById('ins-adrscore').textContent = avgScore + '/100';
+}
+
+// ─── ORDERS ───────────────────────────────────────────────────────────────────
+async function loadOrders(){
+  try{
+    const r=await fetch(API+'/api/orders'); const d=await r.json();
+    if(d.success){ checkNewOrders(d.orders); allOrders=d.orders; renderOrders(); renderShipped(); renderLatest(); checkDuplicates(); updateDashboardStats(); }
+  }catch(e){}
+}
+// ─── ADDRESS SCORE ────────────────────────────────────────────────────────────
+function scoreAddress(o) {
+  let score = 0;
+  const addr = (o.address||'').trim();
+  const pin  = (o.pincode||'').trim();
+  const city = (o.city||'').trim();
+  const name = (o.name||'').trim();
+  // Scoring rules
+  if (pin && /^\d{6}$/.test(pin))    score += 30; // valid pincode
+  if (city && city.length > 2)        score += 20; // city filled
+  if (addr.length > 15)               score += 20; // address detail
+  if (/\d/.test(addr))               score += 10; // has house/flat number
+  if (o.state && o.state.length > 2)  score += 10; // state filled
+  if (name && name.split(' ').length >= 2) score += 10; // full name
+  return Math.min(score, 100);
+}
+function scoreBadge(score) {
+  const dots = [1,2,3,4,5].map(i=>`<span class="score-dot ${i<=Math.round(score/20)?'on':''}"></span>`).join('');
+  if (score >= 70) return `<span class="score-badge score-hi">✅ ${score}<span class="score-dots">${dots}</span></span>`;
+  if (score >= 40) return `<span class="score-badge score-md">⚠️ ${score}<span class="score-dots">${dots}</span></span>`;
+  return `<span class="score-badge score-lo">❌ ${score}<span class="score-dots">${dots}</span></span>`;
+}
+
+// ─── ORDER TIME HELPERS ───────────────────────────────────────────────────────
+function fmtTime(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  const h = dt.getHours(), m = dt.getMinutes().toString().padStart(2,'0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${m} ${ampm}`;
+}
+function isAfterNoon(d) { return d && new Date(d).getHours() >= 12; }
+
+// ─── DATE FILTER HELPERS ──────────────────────────────────────────────────────
+let pmFilter = false;
+function filterPM() {
+  pmFilter = !pmFilter;
+  document.querySelectorAll('.btn').forEach(b => { if(b.textContent.includes('12PM')) b.classList.toggle('btn-orange', pmFilter); });
+  renderOrders();
+}
+function clearDateFilter() {
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  pmFilter = false;
+  renderOrders();
+}
+function setToday() {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('dateFrom').value = today;
+  document.getElementById('dateTo').value = today;
+  renderOrders();
+}
+
+function renderLatest(){
+  const tb=document.getElementById('latestBody');
+  const latest=allOrders.slice(0,5);
+  if(!latest.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty"><span>📭</span>No orders yet</div></td></tr>'; return; }
+  const phoneCounts={};
+  allOrders.forEach(o=>{ if(o.phone) phoneCounts[o.phone]=(phoneCounts[o.phone]||0)+1; });
+  tb.innerHTML=latest.map(o=>{
+    const isDup=phoneCounts[o.phone]>1;
+    const dupBadge=isDup?` <span class="badge" style="background:#fef2f2;color:#dc2626;margin-left:4px" title="Same phone placed ${phoneCounts[o.phone]} orders">⚠️ DUP</span>`:'';
+    const isPM = isAfterNoon(o.createdAt);
+    return `<tr${isDup?' style="background:#fffafa"':''}>
+      <td><b>${o.name}</b></td><td>${o.phone}${dupBadge}</td><td>${o.city||'—'}</td><td>${o.size||'—'}</td>
+      <td><b>₹${o.totalAmount||o.price}</b></td><td>${statusBadge(o.status)}</td>
+      <td><div>${fmtDate(o.createdAt)}</div><div class="${isPM?'time-pm':'time-hi'} order-time">${fmtTime(o.createdAt)}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── ORDERS SUB-TAB STATE ─────────────────────────────────────────────────────
+let currentOrderSubTab = 'active'; // 'active' or 'shipped'
+let currentPage = 1;
+const PAGE_SIZE = 50;
+let currentPageOrders = []; // orders currently visible on screen
+
+function switchOrderTab(tab) {
+  currentOrderSubTab = tab;
+  currentPage = 1;
+  document.getElementById('otab-active').classList.toggle('active', tab==='active');
+  document.getElementById('otab-shipped').classList.toggle('active', tab==='shipped');
+  // Update status filter options
+  const stF = document.getElementById('stFilter');
+  if (tab === 'active') {
+    stF.innerHTML = `<option value="">All Status</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option>`;
+  } else {
+    stF.innerHTML = `<option value="">All Shipped</option><option value="shipped">Shipped</option>`;
+  }
+  renderOrders();
+}
+
+function renderOrders(){
+  const srch=document.getElementById('srchInput').value.toLowerCase();
+  const stF=document.getElementById('stFilter').value;
+  const dateFrom=document.getElementById('dateFrom').value;
+  const dateTo=document.getElementById('dateTo').value;
+  const phoneCounts={};
+  allOrders.forEach(o=>{ if(o.phone) phoneCounts[o.phone]=(phoneCounts[o.phone]||0)+1; });
+
+  // Filter based on sub-tab
+  let pool = allOrders;
+  if (currentOrderSubTab === 'active') {
+    pool = allOrders.filter(o => o.status !== 'shipped');
+  } else {
+    pool = allOrders.filter(o => o.status === 'shipped');
+  }
+
+  let filtered=pool.filter((o,idx)=>{
+    const ms=!srch||o.name?.toLowerCase().includes(srch)||o.phone?.includes(srch)||String(pool.length-idx)===srch.trim();
+    const mst=!stF||o.status===stF;
+    let mdate=true;
+    if(dateFrom||dateTo){
+      const od=new Date(o.createdAt); od.setHours(0,0,0,0);
+      if(dateFrom){const df=new Date(dateFrom);df.setHours(0,0,0,0);if(od<df)mdate=false;}
+      if(dateTo){const dt=new Date(dateTo);dt.setHours(23,59,59,999);if(new Date(o.createdAt)>dt)mdate=false;}
+    }
+    const mpm=!pmFilter||isAfterNoon(o.createdAt);
+    return ms&&mst&&mdate&&mpm;
+  });
+
+  // Update badge counts
+  const activeCount = allOrders.filter(o=>o.status!=='shipped').length;
+  const shippedCount = allOrders.filter(o=>o.status==='shipped').length;
+  document.getElementById('badge-active').textContent = activeCount;
+  document.getElementById('badge-shipped').textContent = shippedCount;
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+  const paged = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  currentPageOrders = paged; // save for CSV export
+
+  const tb=document.getElementById('ordersBody');
+  if(!filtered.length){ tb.innerHTML='<tr><td colspan="11"><div class="empty"><span>📭</span>No orders found</div></td></tr>'; renderPagination(0,0); return; }
+
+  tb.innerHTML=paged.map((o,i)=>{
+    const isDup=phoneCounts[o.phone]>1;
+    const dupBadge=isDup?` <span class="badge" style="background:#fef2f2;color:#dc2626" title="${phoneCounts[o.phone]} orders from this number">⚠️ DUP×${phoneCounts[o.phone]}</span>`:'';
+    const score=scoreAddress(o);
+    const isPM=isAfterNoon(o.createdAt);
+    const aiBtn=`<button class="btn-ai btn-sm" onclick="aiFixAddress('${o._id}')" title="AI fix address">🤖 Fix</button>`;
+    const isChecked = selectedOrderIds.has(o._id);
+    const statusOptions = currentOrderSubTab === 'active'
+      ? ['new','confirmed','shipped','delivered','cancelled']
+      : ['shipped','delivered'];
+    const shipBtn = (o.status==='new'||o.status==='confirmed')
+      ? `<button class="btn btn-orange btn-sm" onclick="quickShipOrder('${o._id}')" title="Ship via Selloship" style="padding:4px 8px;font-size:10px">🚀 Ship</button>`
+      : '';
+    return `<tr${isDup?' style="background:#fffafa"':''}>
+      <td><input type="checkbox" class="order-sel" data-id="${o._id}" ${isChecked?'checked':''} onchange="updateBulkBar()"/></td>
+      <td style="font-size:11px;color:var(--muted);font-weight:700">#${pool.length-pool.indexOf(o)}</td>
+      <td><b>${o.name}</b></td>
+      <td>${o.phone}${dupBadge}</td>
+      <td>${o.city||'—'}</td>
+      <td>${o.size||'—'}</td><td>${o.quantity||1}</td><td><b>₹${o.totalAmount||o.price}</b></td>
+      <td>${scoreBadge(score)} ${aiBtn}</td>
+      <td><select class="st-sel" onchange="updateStatus('${o._id}',this.value)">
+        ${statusOptions.map(s=>`<option value="${s}"${o.status===s?' selected':''}>${cap(s)}</option>`).join('')}
+      </select></td>
+      <td><div style="white-space:nowrap">${fmtDate(o.createdAt)}</div><div class="${isPM?'time-pm':'time-hi'} order-time">${fmtTime(o.createdAt)}</div></td>
+      <td style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-out btn-sm" onclick="openOrderEditModal('${o._id}')" title="Edit order">✏️</button>
+        ${shipBtn}
+        <button class="btn btn-red btn-sm" onclick="delOrder('${o._id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+  renderPagination(currentPage, totalPages);
+}
+
+function renderPagination(page, total) {
+  const row = document.getElementById('paginationRow');
+  if (!row) return;
+  if (total <= 1) { row.innerHTML=''; return; }
+  let html = '';
+  if (page > 1) html += `<button class="btn btn-out btn-sm" onclick="goPage(${page-1})">← Prev</button>`;
+  html += `<span style="font-size:12px;font-weight:800;color:var(--muted)">Page ${page} / ${total}</span>`;
+  if (page < total) html += `<button class="btn btn-out btn-sm" onclick="goPage(${page+1})">Next →</button>`;
+  row.innerHTML = html;
+}
+function goPage(p) { currentPage = p; renderOrders(); }
+
+// ─── SHIPPED TAB RENDER ───────────────────────────────────────────────────────
+function renderShipped() {
+  const srch = (document.getElementById('srchShipped')?.value||'').toLowerCase();
+  const dateFrom = document.getElementById('shippedDateFrom')?.value;
+  const dateTo   = document.getElementById('shippedDateTo')?.value;
+  let shipped = allOrders.filter(o => o.status === 'shipped');
+  if (srch) shipped = shipped.filter(o => o.name?.toLowerCase().includes(srch)||o.phone?.includes(srch));
+  if (dateFrom||dateTo) shipped = shipped.filter(o => {
+    const od=new Date(o.createdAt); od.setHours(0,0,0,0);
+    if(dateFrom){const df=new Date(dateFrom);df.setHours(0,0,0,0);if(od<df)return false;}
+    if(dateTo){const dt=new Date(dateTo);dt.setHours(23,59,59,999);if(new Date(o.createdAt)>dt)return false;}
+    return true;
+  });
+  const tb = document.getElementById('shippedBody');
+  if (!tb) return;
+  if (!shipped.length) { tb.innerHTML='<tr><td colspan="11"><div class="empty"><span>🚚</span>No shipped orders yet</div></td></tr>'; return; }
+  tb.innerHTML = shipped.map((o,i) => {
+    const score = scoreAddress(o);
+    const isPM = isAfterNoon(o.createdAt);
+    const awbDisplay = o.awb
+      ? `<span style="font-family:monospace;font-size:11px;font-weight:800;color:#1d4ed8;background:#eff6ff;padding:2px 7px;border-radius:6px;border:1px solid #bfdbfe">${o.awb}</span>`
+      : `<span style="color:var(--muted);font-size:11px">—</span>`;
+    return `<tr>
+      <td style="font-size:11px;color:var(--muted);font-weight:700">#${i+1}</td>
+      <td><b>${o.name}</b></td><td>${o.phone}</td>
+      <td>${o.city||'—'}</td>
+      <td style="max-width:160px;font-size:11px">${o.address||'—'}</td>
+      <td>${o.size||'—'}</td><td>${o.quantity||1}</td>
+      <td><b>₹${o.totalAmount||o.price}</b></td>
+      <td>${awbDisplay}</td>
+      <td>${scoreBadge(score)}</td>
+      <td><div style="white-space:nowrap">${fmtDate(o.shippedAt||o.createdAt)}</div><div class="${isPM?'time-pm':'time-hi'} order-time">${fmtTime(o.shippedAt||o.createdAt)}</div></td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-out btn-sm" onclick="openOrderEditModal('${o._id}')" title="Edit order">✏️</button>
+        <button class="btn btn-red btn-sm" onclick="delOrder('${o._id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateStatus(id,status){
+  try{
+    const r=await fetch(API+'/api/orders/'+id+'/status',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+    const d=await r.json();
+    if(d.success){
+      toast('Status updated to '+status,'success');
+      const o=allOrders.find(x=>x._id===id);
+      if(o) o.status=status;
+      renderOrders(); renderLatest(); loadStats();
+      // If status changed to shipped, refresh shipped tab badge
+      const shippedCount = allOrders.filter(o=>o.status==='shipped').length;
+      const badge = document.getElementById('badge-shipped');
+      if (badge) badge.textContent = shippedCount;
+    }
+    else toast('Failed to update','error');
+  }catch(e){ toast('Network error','error'); }
+}
+
+async function delOrder(id){
+  if(!confirm('Delete this order?')) return;
+  try{
+    const r=await fetch(API+'/api/orders/'+id,{method:'DELETE'}); const d=await r.json();
+    if(d.success){ allOrders=allOrders.filter(o=>o._id!==id); renderOrders(); renderShipped(); renderLatest(); loadStats(); toast('Order deleted','success'); }
+  }catch(e){ toast('Error','error'); }
+}
+
+// ─── EXPORT CSV (current page only) ──────────────────────────────────────────
+function exportCsvCurrentPage(mode) {
+  const orders = mode === 'shipped'
+    ? allOrders.filter(o=>o.status==='shipped')
+    : (currentPageOrders.length ? currentPageOrders : allOrders.slice(0,PAGE_SIZE));
+
+  const headers = ['#','Name','Phone','Address','Pincode','City','State','Product','Size','Qty','Price','Total','Status','Address Score','Date','Time'];
+  const rows = orders.map((o,i) => {
+    const score = scoreAddress(o);
+    const scoreLabel = score>=70?'High':score>=40?'Medium':'Low';
+    return [
+      i+1,
+      '"'+(o.name||'').replace(/"/g,'""')+'"',
+      o.phone||'',
+      '"'+(o.address||'').replace(/"/g,'""')+'"',
+      o.pincode||'',
+      o.city||'',
+      o.state||'',
+      '"'+(o.productName||o.product||'').replace(/"/g,'""')+'"',
+      o.size||'',
+      o.quantity||1,
+      o.price||0,
+      o.totalAmount||0,
+      o.status||'',
+      score+'/100 ('+scoreLabel+')',
+      fmtDate(o.createdAt),
+      fmtTime(o.createdAt)
+    ].join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (mode==='shipped'?'shipped-orders':'orders-page-'+currentPage)+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded ('+orders.length+' orders)', 'success');
+}
+// Legacy alias
+function exportCsv(){ exportCsvCurrentPage(); }
+
+
+
+// ─── PRODUCTS ─────────────────────────────────────────────────────────────────
+async function loadProducts(){
+  try{
+    const r=await fetch(API+'/api/products/all'); const d=await r.json();
+    if(d.success){ allProducts=d.products; renderProducts(); }
+  }catch(e){}
+}
+function renderProducts(){
+  const grid=document.getElementById('prodGrid');
+  if(!allProducts.length){ grid.innerHTML='<div class="empty"><span>📦</span>No products. Add one!</div>'; return; }
+  grid.innerHTML=allProducts.map(p=>`
+    <div class="prod-card">
+      <img class="prod-img" src="${p.images?.[0]||''}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/260x160/f5f5f5/999?text=No+Image'"/>
+      <div style="font-size:10px;color:#aaa;font-weight:700;margin-bottom:6px">${p.images?.length||1} photo${(p.images?.length||1)>1?'s':''}</div>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-price">₹${p.price}</div>
+      <div class="prod-mrp">MRP ₹${p.mrp||''}</div>
+      <div class="prod-stock">Stock: ${p.stock}</div>
+      <div class="prod-active ${p.active?'pa-yes':'pa-no'}">${p.active?'✅ Active':'❌ Inactive'}</div>
+      <div class="prod-acts">
+        <button class="btn btn-out btn-sm" onclick="openProdModal('${p._id}')">✏️ Edit</button>
+        <button class="btn btn-red btn-sm" onclick="delProd('${p._id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+// ─── IMAGE INPUT MANAGEMENT ───────────────────────────────────────────────────
+function addImageInput(url=''){
+  const wrap=document.getElementById('imgInputs');
+  const row=document.createElement('div');
+  row.className='img-input-row';
+  row.innerHTML=`<input type="text" placeholder="https://... (image URL)" value="${url}" oninput="refreshPreviews()"/>
+    <button class="img-rm-btn" onclick="removeImgRow(this)">✕</button>`;
+  wrap.appendChild(row);
+  refreshPreviews();
+}
+function removeImgRow(btn){ btn.parentElement.remove(); refreshPreviews(); }
+function getImageUrls(){ return Array.from(document.querySelectorAll('#imgInputs .img-input-row input')).map(i=>i.value.trim()).filter(Boolean); }
+function refreshPreviews(){
+  const urls=getImageUrls();
+  document.getElementById('imgPreviews').innerHTML=urls.map(u=>`<img class="img-preview" src="${u}" onerror="this.style.display='none'" alt="preview"/>`).join('');
+}
+function setImageInputs(urls){
+  document.getElementById('imgInputs').innerHTML='';
+  if(urls&&urls.length){ urls.forEach(u=>addImageInput(u)); }
+  else { addImageInput(''); }
+  refreshPreviews();
+}
+
+function openProdModal(id){
+  editingProdId=id||null;
+  document.getElementById('prodModalTitle').textContent=id?'Edit Product':'Add Product';
+  if(id){
+    const p=allProducts.find(x=>x._id===id); if(!p) return;
+    document.getElementById('pm_name').value=p.name||'';
+    document.getElementById('pm_desc').value=p.description||'';
+    document.getElementById('pm_price').value=p.price||'';
+    document.getElementById('pm_mrp').value=p.mrp||'';
+    setImageInputs(p.images||[]);
+    document.getElementById('pm_benefits').value=(p.benefits||[]).join(', ');
+    document.getElementById('pm_ingredients').value=p.ingredients||'';
+    document.getElementById('pm_howToUse').value=p.howToUse||'';
+    document.getElementById('pm_stock').value=p.stock||100;
+    document.getElementById('pm_active').checked=p.active!==false;
+  } else {
+    ['pm_name','pm_desc','pm_price','pm_mrp','pm_benefits','pm_ingredients','pm_howToUse'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('pm_stock').value=100;
+    document.getElementById('pm_active').checked=true;
+    setImageInputs(['']);
+  }
+  document.getElementById('prodModal').classList.add('active');
+}
+function closeProdModal(){ document.getElementById('prodModal').classList.remove('active'); }
+function prodOverlay(e){ if(e.target===document.getElementById('prodModal')) closeProdModal(); }
+
+async function saveProd(){
+  const name=document.getElementById('pm_name').value.trim();
+  if(!name) return toast('Product name required','error');
+  const images=getImageUrls();
+  const payload={
+    name, description:document.getElementById('pm_desc').value.trim(),
+    price:parseFloat(document.getElementById('pm_price').value)||0,
+    mrp:parseFloat(document.getElementById('pm_mrp').value)||0,
+    images, benefits:document.getElementById('pm_benefits').value.split(',').map(s=>s.trim()).filter(Boolean),
+    ingredients:document.getElementById('pm_ingredients').value.trim(),
+    howToUse:document.getElementById('pm_howToUse').value.trim(),
+    stock:parseInt(document.getElementById('pm_stock').value)||100,
+    active:document.getElementById('pm_active').checked
+  };
+  try{
+    const url=editingProdId?API+'/api/products/'+editingProdId:API+'/api/products';
+    const r=await fetch(url,{method:editingProdId?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(d.success){ toast(editingProdId?'Product updated!':'Product added!','success'); closeProdModal(); loadProducts(); }
+    else toast(d.error||'Failed','error');
+  }catch(e){ toast('Network error','error'); }
+}
+async function delProd(id){
+  if(!confirm('Delete this product?')) return;
+  try{
+    const r=await fetch(API+'/api/products/'+id,{method:'DELETE'}); const d=await r.json();
+    if(d.success){ toast('Product deleted','success'); loadProducts(); }
+  }catch(e){ toast('Error','error'); }
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────────────────
+async function loadSettings(){
+  try{
+    const r=await fetch(API+'/api/meta'); const d=await r.json();
+    if(d.success&&d.metaPixel){
+      document.getElementById('pixelInput').value=d.metaPixel;
+      document.getElementById('curPixelId').textContent=d.metaPixel;
+      document.getElementById('curPixelWrap').style.display='block';
+      localStorage.setItem('sweatbelt_pixel_id',d.metaPixel);
+    }
+  }catch(e){}
+}
+async function savePixel(){
+  const val=document.getElementById('pixelInput').value.trim();
+  if(!val) return toast('Enter Pixel ID','error');
+  try{
+    const r=await fetch(API+'/api/meta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({metaPixel:val})});
+    const d=await r.json();
+    if(d.success){ localStorage.setItem('sweatbelt_pixel_id',val); document.getElementById('curPixelId').textContent=val; document.getElementById('curPixelWrap').style.display='block'; toast('Pixel ID saved!','success'); }
+    else toast(d.error||'Failed','error');
+  }catch(e){ toast('Network error','error'); }
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function statusBadge(s){ const m={new:'b-new',confirmed:'b-confirmed',shipped:'b-shipped',delivered:'b-delivered',cancelled:'b-cancelled'}; return `<span class="badge ${m[s]||'b-new'}">${s}</span>`; }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function fmtDate(d){ if(!d) return '—'; return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+
+let toastTimer;
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ─── ORDER NOTIFICATION SOUND SYSTEM ────────────────────────────────────────
+let soundEnabled = true;
+let lastOrderCount = null;
+let selectedSound = localStorage.getItem('sb_sound') || 'ding';
+let soundVolume = parseFloat(localStorage.getItem('sb_vol') || '0.6');
+
+// ── Sound definitions — all synthesized via Web Audio API ─────────────────────
+const SOUNDS = {
+  ding: {
+    name: 'Classic Ding', icon: '🔔', desc: '3-note chime',
+    play(ctx, vol) {
+      [[880,0],[1100,.14],[1320,.28]].forEach(([f,d]) => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=f; o.type='sine';
+        g.gain.setValueAtTime(0,ctx.currentTime+d);
+        g.gain.linearRampToValueAtTime(vol,ctx.currentTime+d+.02);
+        g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.55);
+        o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+.6);
+      });
+    }
+  },
+  cash: {
+    name: 'Cash Register', icon: '💰', desc: 'Ka-ching!',
+    play(ctx, vol) {
+      // Two quick high pings like a cash register
+      [[1800,.0],[2200,.07],[1600,.15]].forEach(([f,d]) => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=f; o.type='square';
+        g.gain.setValueAtTime(0,ctx.currentTime+d);
+        g.gain.linearRampToValueAtTime(vol*.5,ctx.currentTime+d+.01);
+        g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.18);
+        o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+.2);
+      });
+      // Bell tail
+      const o2=ctx.createOscillator(), g2=ctx.createGain();
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.frequency.value=1047; o2.type='sine';
+      g2.gain.setValueAtTime(0,ctx.currentTime+.22);
+      g2.gain.linearRampToValueAtTime(vol*.6,ctx.currentTime+.25);
+      g2.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.9);
+      o2.start(ctx.currentTime+.22); o2.stop(ctx.currentTime+1);
+    }
+  },
+  pop: {
+    name: 'Bubble Pop', icon: '🫧', desc: 'Soft pop',
+    play(ctx, vol) {
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(520,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(180,ctx.currentTime+.12);
+      o.type='sine';
+      g.gain.setValueAtTime(vol,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.18);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime+.2);
+    }
+  },
+  alert: {
+    name: 'Alert Beep', icon: '📣', desc: 'Double beep',
+    play(ctx, vol) {
+      [0, .22].forEach(d => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=880; o.type='square';
+        g.gain.setValueAtTime(0,ctx.currentTime+d);
+        g.gain.linearRampToValueAtTime(vol*.4,ctx.currentTime+d+.01);
+        g.gain.linearRampToValueAtTime(vol*.4,ctx.currentTime+d+.16);
+        g.gain.linearRampToValueAtTime(0,ctx.currentTime+d+.18);
+        o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+.2);
+      });
+    }
+  },
+  chime: {
+    name: 'Wind Chime', icon: '🎐', desc: 'Gentle chime',
+    play(ctx, vol) {
+      [[523,.0],[659,.12],[784,.24],[1047,.36],[1319,.48]].forEach(([f,d]) => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=f; o.type='sine';
+        g.gain.setValueAtTime(0,ctx.currentTime+d);
+        g.gain.linearRampToValueAtTime(vol*.45,ctx.currentTime+d+.03);
+        g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.8);
+        o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+.9);
+      });
+    }
+  },
+  whoosh: {
+    name: 'Whoosh', icon: '💨', desc: 'Swoosh + ding',
+    play(ctx, vol) {
+      // Noise whoosh
+      const buf=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate);
+      const data=buf.getChannelData(0);
+      for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1);
+      const src=ctx.createBufferSource();
+      src.buffer=buf;
+      const filt=ctx.createBiquadFilter(); filt.type='highpass'; filt.frequency.value=2000;
+      const g=ctx.createGain();
+      src.connect(filt); filt.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0,ctx.currentTime);
+      g.gain.linearRampToValueAtTime(vol*.3,ctx.currentTime+.05);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3);
+      src.start(); src.stop(ctx.currentTime+.35);
+      // Ding after
+      const o=ctx.createOscillator(), g2=ctx.createGain();
+      o.connect(g2); g2.connect(ctx.destination);
+      o.frequency.value=1320; o.type='sine';
+      g2.gain.setValueAtTime(0,ctx.currentTime+.28);
+      g2.gain.linearRampToValueAtTime(vol,ctx.currentTime+.30);
+      g2.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.85);
+      o.start(ctx.currentTime+.28); o.stop(ctx.currentTime+.9);
+    }
+  },
+  horn: {
+    name: 'Party Horn', icon: '🎉', desc: 'Celebratory!',
+    play(ctx, vol) {
+      [[392,.0],[494,.08],[587,.16],[698,.24],[880,.32]].forEach(([f,d]) => {
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value=f; o.type='sawtooth';
+        const filt=ctx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=1200;
+        o.connect(filt); filt.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(vol*.35,ctx.currentTime+d);
+        g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.25);
+        o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+.3);
+      });
+    }
+  },
+  silent: {
+    name: 'Silent', icon: '🔕', desc: 'No sound',
+    play() {}
+  }
+};
+
+// ── Sound Picker Modal ─────────────────────────────────────────────────────────
+function openSoundPicker() {
+  const grid = document.getElementById('sndGrid');
+  grid.innerHTML = Object.entries(SOUNDS).map(([key, s]) => `
+    <div class="snd-card ${selectedSound===key?'selected':''}" id="snd-${key}" onclick="selectSound('${key}')">
+      <div>
+        <div style="font-size:22px;margin-bottom:3px">${s.icon}</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="snd-name">${s.name}</div>
+        <div class="snd-desc">${s.desc}</div>
+        <button class="snd-preview" onclick="event.stopPropagation();previewSound('${key}')">▶ Preview</button>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('sndVolSlider').value = Math.round(soundVolume * 100);
+  document.getElementById('sndVolVal').textContent = Math.round(soundVolume * 100) + '%';
+  document.getElementById('muteBtn').textContent = soundEnabled ? '🔔 On' : '🔕 Off';
+  document.getElementById('muteBtn').classList.toggle('on', soundEnabled);
+  document.getElementById('sndOverlay').classList.add('active');
+}
+function closeSoundPicker() { document.getElementById('sndOverlay').classList.remove('active'); }
+function sndOverlayClick(e) { if (e.target===document.getElementById('sndOverlay')) closeSoundPicker(); }
+
+function selectSound(key) {
+  selectedSound = key;
+  document.querySelectorAll('.snd-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('snd-'+key)?.classList.add('selected');
+  previewSound(key);
+}
+
+function previewSound(key) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    SOUNDS[key]?.play(ctx, soundVolume);
+  } catch(e) {}
+}
+
+function updateVolume(val) {
+  soundVolume = val / 100;
+  document.getElementById('sndVolVal').textContent = val + '%';
+}
+
+function toggleMute() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('muteBtn');
+  btn.textContent = soundEnabled ? '🔔 On' : '🔕 Off';
+  btn.classList.toggle('on', soundEnabled);
+}
+
+function saveSoundChoice() {
+  localStorage.setItem('sb_sound', selectedSound);
+  localStorage.setItem('sb_vol', soundVolume.toString());
+  const label = SOUNDS[selectedSound]?.name || 'Ding';
+  document.getElementById('soundLabel').textContent = SOUNDS[selectedSound]?.icon + ' ' + label;
+  const togBtn = document.getElementById('soundTogBtn');
+  togBtn.classList.toggle('on', soundEnabled && selectedSound !== 'silent');
+  closeSoundPicker();
+  toast('Sound saved: ' + label, 'success');
+}
+
+function playOrderSound() {
+  if (!soundEnabled || selectedSound === 'silent') return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    SOUNDS[selectedSound]?.play(ctx, soundVolume);
+  } catch(e) {}
+}
+
+// Init sound label on load
+(function initSoundLabel(){
+  const s = SOUNDS[selectedSound];
+  if (s) document.getElementById('soundLabel').textContent = s.icon + ' ' + s.name;
+  document.getElementById('sndVolSlider') && (document.getElementById('sndVolSlider').value = Math.round(soundVolume*100));
+})();
+
+function checkNewOrders(freshOrders) {
+  if (lastOrderCount === null) { lastOrderCount = freshOrders.length; return; }
+  if (freshOrders.length > lastOrderCount) {
+    const newCount = freshOrders.length - lastOrderCount;
+    playOrderSound();
+    document.getElementById('notifDot').classList.add('show');
+    toast(`🛎️ ${newCount} new order${newCount>1?'s':''} arrived!`, 'success');
+    setTimeout(() => document.getElementById('notifDot').classList.remove('show'), 5000);
+    lastOrderCount = freshOrders.length;
+  } else {
+    lastOrderCount = freshOrders.length;
+  }
+}
+
+// ─── DUPLICATE CLEANER ────────────────────────────────────────────────────────
+function checkDuplicates() {
+  const phoneCounts = {};
+  allOrders.forEach(o => { if (o.phone) phoneCounts[o.phone] = (phoneCounts[o.phone]||0)+1; });
+  const dupPhones = Object.entries(phoneCounts).filter(([,c]) => c > 1);
+  const banner = document.getElementById('dupBanner');
+  const countEl = document.getElementById('dupCount');
+  if (dupPhones.length) {
+    // Count total extra (keepin 1 per phone)
+    const totalDups = dupPhones.reduce((sum,[,c]) => sum + c - 1, 0);
+    countEl.textContent = totalDups;
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+async function clearDuplicates() {
+  const phoneCounts = {};
+  allOrders.forEach(o => { if (o.phone) phoneCounts[o.phone] = (phoneCounts[o.phone]||0)+1; });
+  const dupPhones = new Set(Object.entries(phoneCounts).filter(([,c])=>c>1).map(([p])=>p));
+  if (!dupPhones.size) return toast('No duplicates found!','');
+
+  const totalToDelete = [...dupPhones].reduce((sum, phone) => {
+    const group = allOrders.filter(o => o.phone === phone);
+    return sum + group.length - 1;
+  }, 0);
+
+  if (!confirm(`Delete ${totalToDelete} duplicate order(s)? The LATEST order for each phone number will be kept.`)) return;
+
+  // For each duplicate phone, keep the newest (first in sorted-by-date desc array), delete rest
+  const toDelete = [];
+  dupPhones.forEach(phone => {
+    const group = allOrders.filter(o => o.phone === phone)
+      .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    group.slice(1).forEach(o => toDelete.push(o._id)); // skip index 0 (newest)
+  });
+
+  let deleted = 0, failed = 0;
+  for (const id of toDelete) {
+    try {
+      const r = await fetch(API+'/api/orders/'+id, {method:'DELETE'});
+      const d = await r.json();
+      if (d.success) { allOrders = allOrders.filter(o => o._id !== id); deleted++; }
+      else failed++;
+    } catch(e) { failed++; }
+  }
+
+  renderOrders(); renderLatest(); loadStats(); checkDuplicates();
+  toast(`✅ Cleared ${deleted} duplicates${failed?' ('+failed+' failed)':''}`, deleted?'success':'error');
+}
+
+// ─── SELLOSHIP INTEGRATION ────────────────────────────────────────────────────
+let selloshipToken = '';
+
+function loadSelloshipConfig() {
+  // Restore saved credentials (with defaults pre-filled)
+  const savedUser = localStorage.getItem('sell_username') || 'thevastrac@gmail.com';
+  const savedPass = localStorage.getItem('sell_password') || 'Krist@143';
+  selloshipToken  = localStorage.getItem('sell_token')    || '';
+
+  if (savedUser) document.getElementById('sellUsername').value = savedUser;
+  if (savedPass) document.getElementById('sellPassword').value = savedPass;
+
+  // Restore pickup address
+  const pa = JSON.parse(localStorage.getItem('sell_pickup') || '{}');
+  if (pa.name)  document.getElementById('sp-name').value  = pa.name;
+  if (pa.phone) document.getElementById('sp-phone').value = pa.phone;
+  if (pa.email) document.getElementById('sp-email').value = pa.email;
+  if (pa.addr1) document.getElementById('sp-addr1').value = pa.addr1;
+  if (pa.addr2) document.getElementById('sp-addr2').value = pa.addr2;
+  if (pa.city)  document.getElementById('sp-city').value  = pa.city;
+  if (pa.state) document.getElementById('sp-state').value = pa.state;
+  if (pa.pin)   document.getElementById('sp-pin').value   = pa.pin;
+
+  if (selloshipToken) {
+    setSellStatus('connected', '🟢 Token loaded from storage — ready to ship');
+    showTokenPreview(selloshipToken);
+  }
+
+  // Render orders list for shipment once orders are loaded
+  setTimeout(renderSelloshipOrders, 800);
+}
+
+function saveSelloshipCreds() {
+  const u = document.getElementById('sellUsername').value.trim();
+  const p = document.getElementById('sellPassword').value.trim();
+  if (!u || !p) return toast('Enter username and password', 'error');
+  localStorage.setItem('sell_username', u);
+  localStorage.setItem('sell_password', p);
+  toast('Credentials saved!', 'success');
+}
+
+function savePickupAddress() {
+  const pa = {
+    name:  document.getElementById('sp-name').value.trim(),
+    phone: document.getElementById('sp-phone').value.trim(),
+    email: document.getElementById('sp-email').value.trim(),
+    addr1: document.getElementById('sp-addr1').value.trim(),
+    addr2: document.getElementById('sp-addr2').value.trim(),
+    city:  document.getElementById('sp-city').value.trim(),
+    state: document.getElementById('sp-state').value.trim(),
+    pin:   document.getElementById('sp-pin').value.trim(),
+  };
+  if (!pa.name || !pa.phone || !pa.addr1 || !pa.city || !pa.state || !pa.pin)
+    return toast('Fill all required pickup address fields', 'error');
+  localStorage.setItem('sell_pickup', JSON.stringify(pa));
+  toast('Pickup address saved!', 'success');
+}
+
+function setSellStatus(type, msg) {
+  const el = document.getElementById('sellStatus');
+  el.textContent = msg;
+  el.className = 'sell-status ' + (type === 'connected' ? 'connected' : type === 'error' ? 'disconnected' : '');
+  if (type === 'loading') { el.style.background='#fefce8'; el.style.color='#92400e'; }
+  else { el.style.background=''; el.style.color=''; }
+}
+
+function showTokenPreview(token) {
+  const el = document.getElementById('sellTokenPreview');
+  const preview = token.length > 40 ? token.slice(0,20) + '...' + token.slice(-10) : token;
+  el.textContent = '🔑 Token: ' + preview;
+  el.style.display = 'block';
+}
+
+function clearSelloshipToken() {
+  selloshipToken = '';
+  localStorage.removeItem('sell_token');
+  document.getElementById('sellTokenPreview').style.display = 'none';
+  setSellStatus('error', '🔴 Token cleared — please login again');
+  toast('Token cleared', 'success');
+}
+
+async function loginSelloship() {
+  const username = document.getElementById('sellUsername').value.trim();
+  const password = document.getElementById('sellPassword').value.trim();
+  if (!username || !password) return toast('Enter username and password', 'error');
+
+  const btn = document.getElementById('sellLoginBtn');
+  btn.textContent = '⏳ Logging in...'; btn.disabled = true;
+  setSellStatus('loading', '🟡 Authenticating...');
+
+  try {
+    const r = await fetch(API + '/api/selloship/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const d = await r.json();
+    if (d.success && d.token) {
+      selloshipToken = d.token;
+      localStorage.setItem('sell_token', selloshipToken);
+      localStorage.setItem('sell_username', username);
+      localStorage.setItem('sell_password', password);
+      setSellStatus('connected', '🟢 Logged in — token saved!');
+      showTokenPreview(selloshipToken);
+      toast('Selloship login successful!', 'success');
+      renderSelloshipOrders();
+    } else {
+      setSellStatus('error', '🔴 Login failed — ' + (d.error || 'Invalid credentials'));
+      toast('Login failed: ' + (d.error || 'check credentials'), 'error');
+      // Show raw response for debugging
+      if (d.raw) console.log('Selloship auth raw:', d.raw);
+    }
+  } catch(e) {
+    setSellStatus('error', '🔴 Network error');
+    toast('Network error: ' + e.message, 'error');
+  }
+  btn.textContent = '🔑 Login & Get Token'; btn.disabled = false;
+}
+
+function getPickupAddress() {
+  return JSON.parse(localStorage.getItem('sell_pickup') || '{}');
+}
+
+function buildWaybillPayload(order) {
+  const pa = getPickupAddress();
+  const dims = {
+    length: document.getElementById('dim-l')?.value || '100',
+    breadth: document.getElementById('dim-b')?.value || '100',
+    height:  document.getElementById('dim-h')?.value || '100',
+    weight:  document.getElementById('dim-w')?.value || '500',
+  };
+  return {
+    Shipment: {
+      orderCode: order._id.toString().slice(-8).toUpperCase(),
+      items: [{
+        name:      order.productName || order.product || 'Product',
+        skuCode:   'SKU-001',
+        category:  '',
+        quantity:  order.quantity || 1,
+        itemPrice: String(order.price || order.totalAmount || 0)
+      }],
+      height:  dims.height,
+      length:  dims.length,
+      breadth: dims.breadth,
+      weight:  dims.weight
+    },
+    isLablePdf: false,
+    courierId:   '',
+    courierName: '',
+    paymentMode: 'COD',
+    serviceType: 'Air',
+    totalAmount:      String(order.totalAmount || order.price || 0),
+    collectableAmount: String(order.totalAmount || order.price || 0),
+    pickupAddressDetails: {
+      name:    pa.name  || '',
+      email:   pa.email || '',
+      phone:   pa.phone || '',
+      address1: pa.addr1 || '',
+      address2: pa.addr2 || '',
+      city:    pa.city  || '',
+      state:   pa.state || '',
+      pincode: pa.pin   || '',
+      country: 'India'
+    },
+    returnAddressDetails: {
+      name:    pa.name  || '',
+      email:   pa.email || '',
+      phone:   pa.phone || '',
+      address1: pa.addr1 || '',
+      address2: pa.addr2 || '',
+      city:    pa.city  || '',
+      state:   pa.state || '',
+      pincode: pa.pin   || '',
+      country: 'India'
+    },
+    deliveryAddressDetails: {
+      name:           order.name    || '',
+      email:          '',
+      phone:          order.phone   || '',
+      alternatePhone: '',
+      address1:       order.address || '',
+      address2:       '',
+      city:           order.city    || '',
+      state:          order.state   || '',
+      pincode:        order.pincode || '',
+      country:        'India'
+    }
+  };
+}
+
+async function createSingleShipment(orderId) {
+  if (!selloshipToken) return toast('Login to Selloship first', 'error');
+  const pa = getPickupAddress();
+  if (!pa.name || !pa.addr1) return toast('Save pickup address first (Step 2)', 'error');
+
+  const order = allOrders.find(o => o._id === orderId);
+  if (!order) return toast('Order not found', 'error');
+
+  const btn = document.querySelector(`[data-ship-id="${orderId}"]`);
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
+
+  try {
+    const r = await fetch(API + '/api/selloship/waybill', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: selloshipToken, payload: buildWaybillPayload(order) })
+    });
+    const d = await r.json();
+    if (d.success) {
+      const awb = d.awb || '—';
+      toast(`✅ Shipment created! AWB: ${awb}`, 'success');
+      // Update the row to show AWB
+      const row = document.getElementById('ship-row-' + orderId);
+      if (row) {
+        row.querySelector('.ship-status').innerHTML = `<span class="sell-badge sb-synced">✅ AWB: ${awb}</span>`;
+        if (btn) { btn.textContent = '✅ Done'; btn.disabled = true; }
+      }
+      // Auto-update order status to SHIPPED and save AWB
+      const o = allOrders.find(x => x._id === orderId);
+      if (o) {
+        await fetch(API + '/api/orders/' + orderId + '/status', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'shipped', awb: d.awb || '' })
+        });
+        o.status = 'shipped';
+        o.awb = d.awb || '';
+        renderOrders(); renderShipped(); loadStats();
+      }
+      if (d.raw) console.log('Selloship waybill raw:', d.raw);
+    } else {
+      toast('Failed: ' + (d.error || 'Unknown error'), 'error');
+      if (btn) { btn.textContent = '🚀 Ship'; btn.disabled = false; }
+      // Log raw for debugging
+      if (d.raw) console.log('Selloship waybill error raw:', d.raw);
+    }
+  } catch(e) {
+    toast('Network error: ' + e.message, 'error');
+    if (btn) { btn.textContent = '🚀 Ship'; btn.disabled = false; }
+  }
+}
+
+async function syncAllToSelloship() {
+  if (!selloshipToken) return toast('Login to Selloship first (Step 1)', 'error');
+  const pa = getPickupAddress();
+  if (!pa.name || !pa.addr1) return toast('Save pickup address first (Step 2)', 'error');
+
+  const pending = allOrders.filter(o => o.status === 'new' || o.status === 'confirmed');
+  if (!pending.length) return toast('No new/confirmed orders to sync', '');
+
+  const btn = document.getElementById('sellSyncBtn');
+  btn.textContent = `⏳ Creating ${pending.length} shipments...`; btn.disabled = true;
+
+  const log = document.getElementById('sellSyncLog');
+  log.innerHTML = '';
+  let synced = 0, failed = 0;
+
+  for (const order of pending) {
+    try {
+      const r = await fetch(API + '/api/selloship/waybill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: selloshipToken, payload: buildWaybillPayload(order) })
+      });
+      const d = await r.json();
+      if (d.success) {
+        synced++;
+        const awb = d.awb || '—';
+        log.innerHTML += `<div class="sell-order-row"><span><b>${order.name}</b> · ${order.phone} · #${order._id.toString().slice(-6)}</span><span class="sell-badge sb-synced">✅ AWB: ${awb}</span></div>`;
+        const o = allOrders.find(x => x._id === order._id);
+        if (o) {
+          await fetch(API + '/api/orders/' + order._id + '/status', {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'shipped', awb: d.awb || '' })
+          });
+          o.status = 'shipped';
+          o.awb = d.awb || '';
+        }
+      } else {
+        failed++;
+        log.innerHTML += `<div class="sell-order-row"><span><b>${order.name}</b> · ${order.phone}</span><span class="sell-badge sb-failed">❌ ${d.error || 'Failed'}</span></div>`;
+        if (d.raw) console.log('Selloship sync error for', order._id, d.raw);
+      }
+    } catch(e) {
+      failed++;
+      log.innerHTML += `<div class="sell-order-row"><span><b>${order.name}</b> · ${order.phone}</span><span class="sell-badge sb-failed">❌ Network error</span></div>`;
+    }
+  }
+
+  btn.textContent = '⬆️ Create Shipments for All New/Confirmed Orders'; btn.disabled = false;
+  renderOrders(); renderLatest(); updateDashboardStats();
+  toast(`Done: ${synced} shipments created, ${failed} failed`, synced ? 'success' : 'error');
+  renderSelloshipOrders();
+}
+
+function renderSelloshipOrders() {
+  const container = document.getElementById('sellOrderList');
+  if (!container) return;
+  const pending = allOrders.filter(o => o.status === 'new' || o.status === 'confirmed');
+  if (!pending.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--muted);font-weight:600;text-align:center;padding:16px">No new or confirmed orders to ship.</div>';
+    return;
+  }
+  container.innerHTML = pending.map(o => `
+    <div class="sell-order-row" id="ship-row-${o._id}" style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:13px;font-weight:800">${o.name} <span style="font-size:11px;font-weight:600;color:var(--muted)">· ${o.phone}</span></div>
+        <div style="font-size:11px;font-weight:600;color:#666;margin-top:2px">${o.address||''}, ${o.city||''}, ${o.state||''} — ${o.pincode||''}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-top:2px">${o.productName||o.product||'Product'} · ₹${o.totalAmount||o.price||0} · COD</div>
+      </div>
+      <div class="ship-status" style="flex-shrink:0">
+        <span class="sell-badge" style="background:#fff7ed;color:#c2410c;border:1.5px solid #fed7aa">${o.status}</span>
+      </div>
+      <button class="btn btn-orange btn-sm" data-ship-id="${o._id}" onclick="createSingleShipment('${o._id}')">🚀 Create Shipment</button>
+    </div>
+  `).join('');
+}
+
+// ─── OPENAI KEY ──────────────────────────────────────────────────────────────
+function saveOpenAiKey() {
+  const key = document.getElementById('openaiKey').value.trim();
+  if (!key) return toast('Enter OpenAI API key','error');
+  localStorage.setItem('sb_openai_key', key);
+  toast('OpenAI key saved!','success');
+}
+
+// ─── AI ADDRESS FIX ──────────────────────────────────────────────────────────
+async function aiFixAddress(orderId) {
+  const apiKey = localStorage.getItem('sb_openai_key');
+  if (!apiKey) { toast('Set OpenAI key in Settings first','error'); return; }
+  const order = allOrders.find(o => o._id === orderId);
+  if (!order) return;
+  const btn = document.querySelector(`button[onclick="aiFixAddress('${orderId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+  try {
+    const prompt = `You are a delivery address cleaner for India.
+Clean and fix this delivery address. Return ONLY a JSON object with these fields:
+- name: cleaned full name (fix capitalization)
+- address: cleaned street address (fix spelling, remove junk, trim spaces)
+- city: city name
+- state: state name
+- pincode: 6-digit pincode (keep as-is if valid)
+
+Input address data:
+Name: ${order.name}
+Address: ${order.address}
+City: ${order.city}
+State: ${order.state}
+Pincode: ${order.pincode}
+
+Return ONLY raw JSON, no markdown, no explanation.`;
+
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer '+apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role:'user', content: prompt }],
+        max_tokens: 200, temperature: 0
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'OpenAI error');
+    const raw = d.choices?.[0]?.message?.content?.trim();
+    const fixed = JSON.parse(raw);
+    // Save back to server
+    const upd = await fetch(API+'/api/orders/'+orderId+'/address', {
+      method: 'PUT',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ name: fixed.name, address: fixed.address, city: fixed.city, state: fixed.state, pincode: fixed.pincode })
+    });
+    const ud = await upd.json();
+    if (ud.success) {
+      Object.assign(order, fixed);
+      renderOrders(); renderLatest(); updateDashboardStats();
+      toast('✅ Address fixed by AI!','success');
+    } else { toast('Save failed: '+(ud.error||'error'),'error'); }
+  } catch(e) {
+    toast('AI error: '+e.message,'error');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '🤖 Fix'; }
+}
+
+// ─── JUNK CLEAN ───────────────────────────────────────────────────────────────
+async function runJunkClean() {
+  const btn = document.querySelector('.btn-junk');
+  btn.textContent = '⏳ Cleaning...'; btn.disabled = true;
+  try {
+    const r = await fetch(API+'/api/admin/junk-clean', { method:'POST' });
+    const d = await r.json();
+    const res = document.getElementById('junkResult');
+    res.style.display = 'block';
+    if (d.success) {
+      res.innerHTML = [
+        d.visitors !== undefined ? `👁️ Expired visitor sessions cleared: <b>${d.visitors}</b>` : '',
+        d.ordersFixed !== undefined ? `📦 Order fields trimmed: <b>${d.ordersFixed}</b>` : '',
+        d.emptyOrders !== undefined ? `🗑️ Junk/empty orders removed: <b>${d.emptyOrders}</b>` : '',
+        `✅ <b>Server cleaned!</b> Memory freed.`
+      ].filter(Boolean).join('<br>');
+      toast('🧹 Junk cleaned!','success');
+      loadOrders(); loadStats();
+    } else {
+      res.innerHTML = '❌ Error: ' + (d.error||'Unknown');
+      res.style.color = '#ef4444';
+      toast('Clean failed','error');
+    }
+  } catch(e) {
+    toast('Network error','error');
+  }
+  btn.textContent = '🧹 Clean Now'; btn.disabled = false;
+}
+
+// ─── OPENAI KEY INIT ──────────────────────────────────────────────────────────
+(function(){ const k=localStorage.getItem('sb_openai_key'); if(k&&document.getElementById('openaiKey')) document.getElementById('openaiKey').value=k; })();
+
+
+// ─── TESTIMONIALS ────────────────────────────────────────────────────────────
+let allTestimonials = [];
+let editingTestId = null;
+
+async function loadTestimonials() {
+  try {
+    const r = await fetch(API + '/api/testimonials');
+    const d = await r.json();
+    if (d.success) { allTestimonials = d.testimonials || []; renderTestimonials(); }
+  } catch(e) {}
+}
+
+function renderTestimonials() {
+  const grid = document.getElementById('testGrid');
+  if (!grid) return;
+  if (!allTestimonials.length) {
+    grid.innerHTML = '<div class="empty"><span>⭐</span>No testimonials yet. Add some to display on your store!</div>';
+    return;
+  }
+  grid.innerHTML = allTestimonials.map(t => `
+    <div class="test-card ${t.videoUrl?'test-card-vid':''}">
+      ${t.videoUrl ? `<div class="test-vid-tag">🎬 Video Review</div>` : ''}
+      ${t.thumbnail ? `<img class="test-thumb" src="${t.thumbnail}" alt="thumbnail" onclick="window.open('${t.videoUrl||t.thumbnail}','_blank')"/>` : ''}
+      <div class="test-meta">
+        <div class="test-av ${t.videoUrl?'test-av-vid':''}">${(t.name||'?')[0].toUpperCase()}</div>
+        <div>
+          <div class="test-name">${t.name||'Customer'}</div>
+          <div class="test-loc">📍 ${t.location||'India'}</div>
+        </div>
+      </div>
+      <div class="test-stars">${'★'.repeat(t.rating||5)}${'☆'.repeat(5-(t.rating||5))}</div>
+      <div class="test-review">"${t.review||''}"</div>
+      <div class="test-acts">
+        <button class="btn btn-out btn-sm" onclick="openTestimonialModal('${t._id}')">✏️ Edit</button>
+        <button class="btn btn-red btn-sm" onclick="deleteTestimonial('${t._id}')">🗑️ Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openTestimonialModal(id) {
+  editingTestId = id || null;
+  const t = id ? allTestimonials.find(x=>x._id===id) : null;
+  document.getElementById('tm_name').value   = t?.name||'';
+  document.getElementById('tm_loc').value    = t?.location||'';
+  document.getElementById('tm_rating').value = t?.rating||5;
+  document.getElementById('tm_review').value = t?.review||'';
+  document.getElementById('tm_videoUrl').value   = t?.videoUrl||'';
+  document.getElementById('tm_thumbnail').value  = t?.thumbnail||'';
+  document.getElementById('testModalTitle').textContent = id ? 'Edit Testimonial' : 'Add Testimonial';
+  document.getElementById('testModal').classList.add('active');
+}
+function closeTestimonialModal() { document.getElementById('testModal').classList.remove('active'); }
+function testModalOverlay(e) { if(e.target===document.getElementById('testModal')) closeTestimonialModal(); }
+
+async function saveTestimonial() {
+  const payload = {
+    name:      document.getElementById('tm_name').value.trim(),
+    location:  document.getElementById('tm_loc').value.trim(),
+    rating:    parseInt(document.getElementById('tm_rating').value)||5,
+    review:    document.getElementById('tm_review').value.trim(),
+    videoUrl:  document.getElementById('tm_videoUrl').value.trim(),
+    thumbnail: document.getElementById('tm_thumbnail').value.trim(),
+  };
+  if (!payload.name || !payload.review) return toast('Name and review are required','error');
+  try {
+    const url = editingTestId ? API+'/api/testimonials/'+editingTestId : API+'/api/testimonials';
+    const method = editingTestId ? 'PUT' : 'POST';
+    const r = await fetch(url, {method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    const d = await r.json();
+    if (d.success) {
+      toast(editingTestId?'Testimonial updated!':'Testimonial added!','success');
+      closeTestimonialModal();
+      loadTestimonials();
+    } else toast(d.error||'Failed','error');
+  } catch(e) { toast('Network error','error'); }
+}
+
+async function deleteTestimonial(id) {
+  if (!confirm('Delete this testimonial?')) return;
+  try {
+    const r = await fetch(API+'/api/testimonials/'+id, {method:'DELETE'});
+    const d = await r.json();
+    if (d.success) { toast('Deleted','success'); loadTestimonials(); }
+    else toast(d.error||'Failed','error');
+  } catch(e) { toast('Error','error'); }
+}
+
+
+// ─── BULK SHIP ────────────────────────────────────────────────────────────────
+let selectedOrderIds = new Set();
+
+function updateBulkBar() {
+  document.querySelectorAll('.order-sel:checked').forEach(cb => selectedOrderIds.add(cb.dataset.id));
+  document.querySelectorAll('.order-sel:not(:checked)').forEach(cb => selectedOrderIds.delete(cb.dataset.id));
+  const count = selectedOrderIds.size;
+  const bar = document.getElementById('bulkShipBar');
+  document.getElementById('bulkSelCount').textContent = count;
+  bar.style.display = count > 0 ? 'flex' : 'none';
+}
+
+function toggleSelectAll(cb) {
+  document.querySelectorAll('.order-sel').forEach(el => { el.checked = cb.checked; });
+  updateBulkBar();
+}
+
+function clearBulkSelection() {
+  selectedOrderIds.clear();
+  document.querySelectorAll('.order-sel').forEach(el => el.checked = false);
+  const chk = document.getElementById('selectAllChk');
+  if (chk) chk.checked = false;
+  document.getElementById('bulkShipBar').style.display = 'none';
+}
+
+function openBulkShipModal() {
+  if (!selectedOrderIds.size) {
+    // Auto-select all new+confirmed if nothing selected
+    allOrders.filter(o => o.status==='new'||o.status==='confirmed').forEach(o => selectedOrderIds.add(o._id));
+  }
+  const orders = allOrders.filter(o => selectedOrderIds.has(o._id));
+  const modal = document.getElementById('bulkShipModal');
+  document.getElementById('bsm-count').textContent = orders.length;
+  document.getElementById('bsm-log').style.display = 'none';
+  document.getElementById('bsm-log').innerHTML = '';
+
+  // Status check
+  const statusWrap = document.getElementById('bsm-status-wrap');
+  if (!selloshipToken) {
+    statusWrap.innerHTML = `<div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:#dc2626">🔴 Not connected to Selloship. Go to <b>Settings → Selloship</b> and connect first.</div>`;
+  } else {
+    const pa = getPickupAddress();
+    if (!pa.name||!pa.addr1) {
+      statusWrap.innerHTML = `<div style="background:#fefce8;border:1.5px solid #fef08a;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:#92400e">⚠️ Pickup address not saved. Fill it in Settings or the Selloship tab.</div>`;
+    } else {
+      statusWrap.innerHTML = `<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:700;color:#16a34a">🟢 Connected · Pickup: ${pa.name}, ${pa.city}</div>`;
+    }
+  }
+
+  document.getElementById('bsm-order-list').innerHTML = orders.length
+    ? orders.map(o => `
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:13px;font-weight:800">${o.name} <span style="font-size:11px;font-weight:600;color:var(--muted)">· ${o.phone}</span></div>
+          <div style="font-size:11px;color:#666;margin-top:2px">${o.city||''}, ${o.pincode||''} · ₹${o.totalAmount||o.price||0}</div>
+        </div>
+        <span class="badge b-${o.status}">${cap(o.status)}</span>
+      </div>`).join('')
+    : '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">No orders selected. Close and select orders from the Orders tab.</div>';
+
+  const goBtn = document.getElementById('bsm-go-btn');
+  goBtn.disabled = false;
+  goBtn.textContent = `🚚 Ship All ${orders.length} Orders`;
+  modal.classList.add('active');
+}
+
+function closeBulkShipModal() {
+  document.getElementById('bulkShipModal').classList.remove('active');
+}
+
+async function executeBulkShip() {
+  if (!selloshipToken) return toast('Connect to Selloship first in Settings', 'error');
+  const pa = getPickupAddress();
+  if (!pa.name||!pa.addr1) return toast('Save pickup address first', 'error');
+
+  const orders = allOrders.filter(o => selectedOrderIds.has(o._id));
+  if (!orders.length) return toast('No orders to ship', 'error');
+
+  const btn = document.getElementById('bsm-go-btn');
+  btn.disabled = true;
+  btn.textContent = `⏳ Shipping 0/${orders.length}...`;
+
+  const log = document.getElementById('bsm-log');
+  log.style.display = 'block';
+  log.innerHTML = '';
+
+  // Use modal dimension fields
+  const dims = {
+    length:  document.getElementById('bsm-l')?.value || '100',
+    breadth: document.getElementById('bsm-b')?.value || '100',
+    height:  document.getElementById('bsm-h')?.value || '100',
+    weight:  document.getElementById('bsm-w')?.value || '500',
+  };
+
+  let done = 0, failed = 0;
+  for (const order of orders) {
+    const payload = buildWaybillPayloadWithDims(order, dims);
+    try {
+      const r = await fetch(API + '/api/selloship/waybill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: selloshipToken, payload })
+      });
+      const d = await r.json();
+      if (d.success) {
+        const awb = d.awb || '';
+        await fetch(API + '/api/orders/' + order._id + '/status', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'shipped', awb })
+        });
+        const o = allOrders.find(x => x._id === order._id);
+        if (o) { o.status = 'shipped'; o.awb = awb; }
+        done++;
+        log.innerHTML += `<div style="color:#16a34a;padding:3px 0;border-bottom:1px solid #e5e7eb">✅ ${order.name} · ${order.phone} → AWB: <b>${awb||'—'}</b></div>`;
+      } else {
+        failed++;
+        log.innerHTML += `<div style="color:#dc2626;padding:3px 0;border-bottom:1px solid #e5e7eb">❌ ${order.name} · ${order.phone} — ${d.error||'Failed'}</div>`;
+      }
+    } catch(e) {
+      failed++;
+      log.innerHTML += `<div style="color:#dc2626;padding:3px 0;border-bottom:1px solid #e5e7eb">❌ ${order.name} — Network error</div>`;
+    }
+    btn.textContent = `⏳ Shipped ${done+failed}/${orders.length}...`;
+    log.scrollTop = log.scrollHeight;
+  }
+
+  btn.disabled = false;
+  btn.textContent = `✅ Done — ${done} shipped, ${failed} failed`;
+  clearBulkSelection();
+  renderOrders(); renderShipped(); loadStats(); updateDashboardStats();
+  toast(`📦 ${done} orders shipped${failed?' · '+failed+' failed':''}`, done?'success':'error');
+}
+
+async function executeBulkManualShip() {
+  const orders = allOrders.filter(o => selectedOrderIds.has(o._id));
+  if (!orders.length) return toast('No orders selected', 'error');
+  if (!confirm(`Mark ${orders.length} orders as Shipped manually (no AWB)?`)) return;
+
+  const btn = document.getElementById('bsm-manual-btn');
+  btn.disabled = true;
+  btn.textContent = `⏳ Marking ${orders.length}...`;
+
+  const log = document.getElementById('bsm-log');
+  log.style.display = 'block';
+  log.innerHTML = '';
+
+  let done = 0, failed = 0;
+  for (const order of orders) {
+    try {
+      const r = await fetch(API + '/api/orders/' + order._id + '/status', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'shipped', awb: 'MANUAL' })
+      });
+      const d = await r.json();
+      if (d.success) {
+        const o = allOrders.find(x => x._id === order._id);
+        if (o) { o.status = 'shipped'; o.awb = 'MANUAL'; }
+        done++;
+        log.innerHTML += `<div style="color:#16a34a;padding:3px 0;border-bottom:1px solid #e5e7eb">✅ ${order.name} · ${order.phone} → Marked shipped</div>`;
+      } else { failed++; log.innerHTML += `<div style="color:#dc2626;padding:3px 0">❌ ${order.name} — ${d.error||'Failed'}</div>`; }
+    } catch(e) { failed++; log.innerHTML += `<div style="color:#dc2626;padding:3px 0">❌ ${order.name} — Network error</div>`; }
+    log.scrollTop = log.scrollHeight;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✏️ Mark All as Shipped';
+  clearBulkSelection();
+  renderOrders(); renderShipped(); loadStats(); updateDashboardStats();
+  toast(`✅ ${done} marked shipped${failed?' · '+failed+' failed':''}`, done?'success':'error');
+}
+
+function buildWaybillPayloadWithDims(order, dims) {
+  const pa = getPickupAddress();
+  return {
+    Shipment: {
+      orderCode: order._id.toString().slice(-8).toUpperCase(),
+      items: [{ name: order.productName||order.product||'Product', skuCode:'SKU-001', category:'', quantity: order.quantity||1, itemPrice: String(order.price||order.totalAmount||0) }],
+      height: dims.height, length: dims.length, breadth: dims.breadth, weight: dims.weight
+    },
+    isLablePdf: false, courierId:'', courierName:'',
+    paymentMode: 'COD', serviceType:'Air',
+    totalAmount: String(order.totalAmount||order.price||0),
+    collectableAmount: String(order.totalAmount||order.price||0),
+    pickupAddressDetails:  { name:pa.name||'', email:pa.email||'', phone:pa.phone||'', address1:pa.addr1||'', address2:pa.addr2||'', city:pa.city||'', state:pa.state||'', pincode:pa.pin||'', country:'India' },
+    returnAddressDetails:  { name:pa.name||'', email:pa.email||'', phone:pa.phone||'', address1:pa.addr1||'', address2:pa.addr2||'', city:pa.city||'', state:pa.state||'', pincode:pa.pin||'', country:'India' },
+    deliveryAddressDetails:{ name:order.name||'', email:'', phone:order.phone||'', alternatePhone:'', address1:order.address||'', address2:'', city:order.city||'', state:order.state||'', pincode:order.pincode||'', country:'India' }
+  };
+}
+
+// Quick ship single order from orders table — shows choice modal
+async function quickShipOrder(orderId) {
+  const order = allOrders.find(o => o._id === orderId);
+  if (!order) return;
+  openShipChoiceModal(orderId);
+}
+
+// ─── ORDER EDIT MODAL ─────────────────────────────────────────────────────────
+let editingOrderId = null;
+
+function openOrderEditModal(id) {
+  editingOrderId = id;
+  const o = allOrders.find(x => x._id === id);
+  if (!o) return;
+  document.getElementById('oem-id').textContent = '#' + o._id.toString().slice(-8);
+  document.getElementById('oem-name').value    = o.name    || '';
+  document.getElementById('oem-phone').value   = o.phone   || '';
+  document.getElementById('oem-address').value = o.address || '';
+  document.getElementById('oem-pincode').value = o.pincode || '';
+  document.getElementById('oem-city').value    = o.city    || '';
+  document.getElementById('oem-state').value   = o.state   || '';
+  document.getElementById('oem-size').value    = o.size    || 'M';
+  document.getElementById('oem-qty').value     = o.quantity || 1;
+  document.getElementById('oem-amount').value  = o.totalAmount || o.price || '';
+  document.getElementById('oem-status').value  = o.status  || 'new';
+  document.getElementById('oem-awb').value     = o.awb     || '';
+  document.getElementById('orderEditModal').classList.add('active');
+}
+
+function closeOrderEditModal() {
+  document.getElementById('orderEditModal').classList.remove('active');
+  editingOrderId = null;
+}
+
+async function oemPinLookup(pin) {
+  if (pin.length !== 6) return;
+  try {
+    const r = await fetch(API + '/api/pincode/' + pin);
+    const d = await r.json();
+    const info = d.data?.[0]?.PostOffice?.[0];
+    if (info) {
+      document.getElementById('oem-city').value  = info.District || info.Name || '';
+      document.getElementById('oem-state').value = info.State || '';
+    }
+  } catch(e) {}
+}
+
+async function saveOrderEdit() {
+  if (!editingOrderId) return;
+  const name    = document.getElementById('oem-name').value.trim();
+  const phone   = document.getElementById('oem-phone').value.trim();
+  const address = document.getElementById('oem-address').value.trim();
+  const pincode = document.getElementById('oem-pincode').value.trim();
+  const city    = document.getElementById('oem-city').value.trim();
+  const state   = document.getElementById('oem-state').value.trim();
+  if (!name||!phone||!address||!pincode) return toast('Name, phone, address and pincode are required','error');
+
+  const payload = {
+    name, phone, address, pincode, city, state,
+    size:        document.getElementById('oem-size').value,
+    quantity:    parseInt(document.getElementById('oem-qty').value)||1,
+    totalAmount: parseFloat(document.getElementById('oem-amount').value)||0,
+    status:      document.getElementById('oem-status').value,
+    awb:         document.getElementById('oem-awb').value.trim(),
+  };
+  if (payload.status === 'shipped' && payload.awb) payload.shippedAt = new Date();
+
+  try {
+    const r = await fetch(API + '/api/orders/' + editingOrderId, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.success) {
+      // Update local cache
+      const o = allOrders.find(x => x._id === editingOrderId);
+      if (o) Object.assign(o, payload);
+      toast('✅ Order updated!', 'success');
+      closeOrderEditModal();
+      renderOrders(); renderShipped(); renderLatest(); updateDashboardStats();
+    } else { toast('Save failed: '+(d.error||'error'), 'error'); }
+  } catch(e) { toast('Network error: '+e.message, 'error'); }
+}
+
+// ─── SHIP CHOICE MODAL ───────────────────────────────────────────────────────
+let shipChoiceOrderId = null;
+
+function openShipChoiceModal(orderId) {
+  shipChoiceOrderId = orderId;
+  const o = allOrders.find(x => x._id === orderId);
+  if (!o) return;
+  const info = document.getElementById('scm-order-info');
+  info.innerHTML = `<b>${o.name}</b> · ${o.phone}<br><span style="font-weight:600;color:#666">${o.address||''}, ${o.city||''}, ${o.pincode||''}</span><br><span style="color:var(--purple);font-weight:800">₹${o.totalAmount||o.price||0} · COD</span>`;
+  document.getElementById('shipChoiceModal').classList.add('active');
+}
+
+function closeShipChoiceModal() {
+  document.getElementById('shipChoiceModal').classList.remove('active');
+  shipChoiceOrderId = null;
+}
+
+async function shipViaSelloshipChoice() {
+  if (!selloshipToken) {
+    toast('Not connected to Selloship — go to Settings to connect first', 'error');
+    closeShipChoiceModal();
+    showTab('settings');
+    return;
+  }
+  const pa = getPickupAddress();
+  if (!pa.name||!pa.addr1) {
+    toast('Pickup address not saved — fill it in Settings', 'error');
+    closeShipChoiceModal();
+    showTab('settings');
+    return;
+  }
+  const savedId = shipChoiceOrderId;
+  closeShipChoiceModal();
+  shipChoiceOrderId = savedId; // keep for createSingleShipment
+  await createSingleShipment(savedId);
+  shipChoiceOrderId = null;
+}
+
+function openManualShipModal() {
+  document.getElementById('shipChoiceModal').classList.remove('active');
+  const o = allOrders.find(x => x._id === shipChoiceOrderId);
+  if (!o) return;
+  const info = document.getElementById('msm-order-info');
+  info.innerHTML = `<b>${o.name}</b> · ${o.phone}<br><span style="font-weight:600;color:#666">${o.address||''}, ${o.city||''}</span>`;
+  document.getElementById('msm-courier').value = '';
+  document.getElementById('msm-awb').value = '';
+  document.getElementById('msm-remarks').value = '';
+  document.getElementById('manualShipModal').classList.add('active');
+}
+
+function closeManualShipModal() {
+  document.getElementById('manualShipModal').classList.remove('active');
+}
+
+async function confirmManualShip() {
+  const orderId = shipChoiceOrderId;
+  if (!orderId) return;
+  const awb     = document.getElementById('msm-awb').value.trim();
+  const courier = document.getElementById('msm-courier').value.trim();
+  const awbFinal = awb || (courier ? courier.toUpperCase().slice(0,3)+'-MANUAL' : 'MANUAL');
+  try {
+    const r = await fetch(API + '/api/orders/' + orderId + '/status', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'shipped', awb: awbFinal })
+    });
+    const d = await r.json();
+    if (d.success) {
+      const o = allOrders.find(x => x._id === orderId);
+      if (o) { o.status = 'shipped'; o.awb = awbFinal; }
+      toast(`✅ Marked as shipped${awb?' · AWB: '+awb:''}${courier?' via '+courier:''}`, 'success');
+      closeManualShipModal();
+      shipChoiceOrderId = null;
+      renderOrders(); renderShipped(); loadStats(); updateDashboardStats();
+    } else { toast('Failed: '+(d.error||'error'), 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+// ─── SETTINGS SELLOSHIP SYNC ──────────────────────────────────────────────────
+function syncSettingsToSelloshipTab() {
+  // Keep both credential inputs in sync
+  const settUser = document.getElementById('settSellUser')?.value;
+  const settPass = document.getElementById('settSellPass')?.value;
+  if (settUser) document.getElementById('sellUsername').value = settUser;
+  if (settPass) document.getElementById('sellPassword').value = settPass;
+}
+
+async function loginSelloshipFromSettings() {
+  const username = document.getElementById('settSellUser').value.trim();
+  const password = document.getElementById('settSellPass').value.trim();
+  if (!username||!password) return toast('Enter username and password','error');
+  // Mirror to selloship tab inputs
+  document.getElementById('sellUsername').value = username;
+  document.getElementById('sellPassword').value = password;
+  // Call the main login function
+  await loginSelloship();
+  // Update settings status badge
+  const el = document.getElementById('settSellStatus');
+  if (selloshipToken) {
+    el.textContent = '🟢 Connected';
+    el.className = 'sell-status connected';
+    const prev = document.getElementById('settTokenPreview');
+    const preview = selloshipToken.length>40 ? selloshipToken.slice(0,20)+'...'+selloshipToken.slice(-10) : selloshipToken;
+    prev.textContent = '🔑 Token: '+preview;
+    prev.style.display = 'block';
+  } else {
+    el.textContent = '🔴 Login failed';
+    el.className = 'sell-status disconnected';
+  }
+}
+
+function savePickupAddressFromSettings() {
+  // Mirror settings fields to selloship tab fields and save
+  const map = { 'ssp-name':'sp-name','ssp-phone':'sp-phone','ssp-email':'sp-email','ssp-addr1':'sp-addr1','ssp-addr2':'sp-addr2','ssp-city':'sp-city','ssp-state':'sp-state','ssp-pin':'sp-pin' };
+  Object.entries(map).forEach(([from,to]) => {
+    const v = document.getElementById(from)?.value||'';
+    const t = document.getElementById(to);
+    if (t) t.value = v;
+  });
+  savePickupAddress(); // calls original which saves to localStorage
+}
+
+// Populate settings fields from localStorage on load
+function initSettingsFields() {
+  const savedUser = localStorage.getItem('sell_username') || 'thevastrac@gmail.com';
+  const savedPass = localStorage.getItem('sell_password') || 'Krist@143';
+  if (savedUser && document.getElementById('settSellUser')) document.getElementById('settSellUser').value = savedUser;
+  if (savedPass && document.getElementById('settSellPass')) document.getElementById('settSellPass').value = savedPass;
+  const el = document.getElementById('settSellStatus');
+  if (el && selloshipToken) {
+    el.textContent = '🟢 Connected';
+    el.className = 'sell-status connected';
+    const prev = document.getElementById('settTokenPreview');
+    if (prev) {
+      const preview = selloshipToken.length>40 ? selloshipToken.slice(0,20)+'...'+selloshipToken.slice(-10) : selloshipToken;
+      prev.textContent = '🔑 Token: '+preview;
+      prev.style.display = 'block';
+    }
+  }
+  // Populate pickup address fields in settings from localStorage
+  const pa = JSON.parse(localStorage.getItem('sell_pickup')||'{}');
+  const settMap = { 'ssp-name':'name','ssp-phone':'phone','ssp-email':'email','ssp-addr1':'addr1','ssp-addr2':'addr2','ssp-city':'city','ssp-state':'state','ssp-pin':'pin' };
+  Object.entries(settMap).forEach(([id,key]) => {
+    const el = document.getElementById(id);
+    if (el && pa[key]) el.value = pa[key];
+  });
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+checkAuth();
+</script>
+
+<!-- TESTIMONIAL MODAL -->
+<div class="m-overlay" id="testModal" onclick="testModalOverlay(event)">
+  <div class="m-box">
+    <div class="m-head"><h3 id="testModalTitle">Add Testimonial</h3><button class="m-close" onclick="closeTestimonialModal()">✕</button></div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Customer Name *</label><input class="finput" id="tm_name" placeholder="e.g. Priya Sharma"/></div>
+      <div class="fg"><label class="fl">Location</label><input class="finput" id="tm_loc" placeholder="e.g. Mumbai, Maharashtra"/></div>
+    </div>
+    <div class="fg"><label class="fl">Rating (1–5)</label>
+      <select class="finput" id="tm_rating">
+        <option value="5">★★★★★ (5)</option>
+        <option value="4">★★★★☆ (4)</option>
+        <option value="3">★★★☆☆ (3)</option>
+        <option value="2">★★☆☆☆ (2)</option>
+        <option value="1">★☆☆☆☆ (1)</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Review Text *</label><textarea class="finput" id="tm_review" placeholder="Customer's review in their words..." style="min-height:90px"></textarea></div>
+    <div style="background:#f5f3ff;border-radius:10px;padding:14px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:800;color:#8b5cf6;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">🎬 Video Testimonial (Optional)</div>
+      <div class="fg" style="margin-bottom:10px"><label class="fl">Video URL</label><input class="finput" id="tm_videoUrl" placeholder="https://... (YouTube, direct MP4, etc.)"/></div>
+      <div class="fg" style="margin-bottom:0"><label class="fl">Thumbnail Image URL</label><input class="finput" id="tm_thumbnail" placeholder="https://... (preview image for video)"/></div>
+    </div>
+    <button class="btn btn-orange" style="width:100%;justify-content:center;padding:13px;font-size:14px" onclick="saveTestimonial()">💾 Save Testimonial</button>
+  </div>
+</div>
+
+<!-- SOUND PICKER MODAL -->
+<div class="snd-overlay" id="sndOverlay" onclick="sndOverlayClick(event)">
+  <div class="snd-box" id="sndBox">
+    <div class="snd-head">
+      <h3>🎵 Choose Notification Sound</h3>
+      <button class="m-close" onclick="closeSoundPicker()">✕</button>
+    </div>
+    <div class="snd-sub">Pick a sound that plays when a new order arrives</div>
+
+    <div class="snd-grid" id="sndGrid">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="snd-vol-row">
+      <label>🔊 Volume</label>
+      <input type="range" id="sndVolSlider" min="0" max="100" value="60" oninput="updateVolume(this.value)"/>
+      <div class="snd-vol-val" id="sndVolVal">60%</div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-orange" style="flex:1;justify-content:center" onclick="saveSoundChoice()">✅ Save</button>
+      <button class="btn btn-out" onclick="closeSoundPicker()">Cancel</button>
+      <button class="sound-tog" id="muteBtn" onclick="toggleMute()" style="flex-shrink:0">🔔 On</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHIP CHOICE MODAL -->
+<div class="m-overlay" id="shipChoiceModal" onclick="if(event.target===this)closeShipChoiceModal()">
+  <div class="m-box" style="max-width:460px">
+    <div class="m-head">
+      <h3>🚚 Ship This Order</h3>
+      <button class="m-close" onclick="closeShipChoiceModal()">✕</button>
+    </div>
+    <div id="scm-order-info" style="background:var(--gray);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:12px;font-weight:700;color:var(--black)"></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-orange" style="padding:16px;font-size:14px;justify-content:center;width:100%" onclick="shipViaSelloshipChoice()">
+        🚀 Ship via Selloship (Auto AWB)
+      </button>
+      <button class="btn btn-out" style="padding:16px;font-size:14px;justify-content:center;width:100%;border:2px solid var(--border)" onclick="openManualShipModal()">
+        ✏️ Ship Manually (Enter AWB / Courier)
+      </button>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--muted);font-weight:600;text-align:center">Ship via Selloship to auto-generate AWB · Manual for other couriers</div>
+  </div>
+</div>
+
+<!-- MANUAL SHIP MODAL -->
+<div class="m-overlay" id="manualShipModal" onclick="if(event.target===this)closeManualShipModal()">
+  <div class="m-box" style="max-width:440px">
+    <div class="m-head">
+      <h3>✏️ Manual Shipment</h3>
+      <button class="m-close" onclick="closeManualShipModal()">✕</button>
+    </div>
+    <div id="msm-order-info" style="background:var(--gray);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;font-weight:700;color:var(--black)"></div>
+    <div class="fg"><label class="fl">Courier Name</label><input class="finput" id="msm-courier" placeholder="e.g. Delhivery, DTDC, Bluedart..."/></div>
+    <div class="fg"><label class="fl">AWB / Tracking Number</label><input class="finput" id="msm-awb" placeholder="e.g. 1234567890 (leave blank if not available yet)"/></div>
+    <div class="fg"><label class="fl">Remarks (optional)</label><input class="finput" id="msm-remarks" placeholder="Any notes about this shipment"/></div>
+    <button class="btn btn-orange" style="width:100%;justify-content:center;padding:13px;font-size:14px;margin-top:6px" onclick="confirmManualShip()">✅ Mark as Shipped</button>
+  </div>
+</div>
+
+<!-- ORDER EDIT MODAL -->
+<div class="m-overlay" id="orderEditModal" onclick="if(event.target===this)closeOrderEditModal()">
+  <div class="m-box" style="max-width:620px">
+    <div class="m-head">
+      <h3>✏️ Edit Order <span id="oem-id" style="font-size:12px;font-weight:600;color:var(--muted)"></span></h3>
+      <button class="m-close" onclick="closeOrderEditModal()">✕</button>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Full Name *</label><input class="finput" id="oem-name" placeholder="Customer name"/></div>
+      <div class="fg"><label class="fl">Phone *</label><input class="finput" id="oem-phone" placeholder="10-digit mobile"/></div>
+    </div>
+    <div class="fg"><label class="fl">Address *</label><textarea class="finput" id="oem-address" style="min-height:60px" placeholder="House/flat no, street, locality..."></textarea></div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Pincode *</label><input class="finput" id="oem-pincode" placeholder="6-digit pincode" maxlength="6" oninput="oemPinLookup(this.value)"/></div>
+      <div class="fg"><label class="fl">City *</label><input class="finput" id="oem-city" placeholder="City"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">State *</label><input class="finput" id="oem-state" placeholder="State"/></div>
+      <div class="fg"><label class="fl">Size</label>
+        <select class="finput" id="oem-size">
+          <option value="S">S</option><option value="M">M</option><option value="L">L</option>
+          <option value="XL">XL</option><option value="XXL">XXL</option><option value="Free Size">Free Size</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Quantity</label><input class="finput" id="oem-qty" type="number" min="1" placeholder="1"/></div>
+      <div class="fg"><label class="fl">Total Amount (₹)</label><input class="finput" id="oem-amount" type="number" placeholder="599"/></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Status</label>
+        <select class="finput" id="oem-status">
+          <option value="new">New</option><option value="confirmed">Confirmed</option>
+          <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">AWB / Tracking No</label><input class="finput" id="oem-awb" placeholder="(leave blank if not shipped)"/></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn btn-orange" style="flex:1;justify-content:center;padding:13px;font-size:14px" onclick="saveOrderEdit()">💾 Save Changes</button>
+      <button class="btn btn-out" onclick="closeOrderEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- BULK SHIP MODAL -->
+<div class="m-overlay" id="bulkShipModal" onclick="if(event.target===this)closeBulkShipModal()">
+  <div class="m-box" style="max-width:660px">
+    <div class="m-head">
+      <h3>📦 Bulk Ship via Selloship</h3>
+      <button class="m-close" onclick="closeBulkShipModal()">✕</button>
+    </div>
+    <div id="bsm-status-wrap" style="margin-bottom:14px"></div>
+    <!-- Dimensions -->
+    <div style="background:var(--gray);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">📐 Package Dimensions (applies to all selected)</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px"><label style="font-size:11px;font-weight:800">L (mm)</label><input class="finput" id="bsm-l" style="width:70px;padding:6px 8px" value="100"/></div>
+        <div style="display:flex;align-items:center;gap:6px"><label style="font-size:11px;font-weight:800">B (mm)</label><input class="finput" id="bsm-b" style="width:70px;padding:6px 8px" value="100"/></div>
+        <div style="display:flex;align-items:center;gap=6px"><label style="font-size:11px;font-weight:800">H (mm)</label><input class="finput" id="bsm-h" style="width:70px;padding:6px 8px" value="100"/></div>
+        <div style="display:flex;align-items:center;gap:6px"><label style="font-size:11px;font-weight:800">Wt (g)</label><input class="finput" id="bsm-w" style="width:70px;padding:6px 8px" value="500"/></div>
+      </div>
+    </div>
+    <!-- Order list -->
+    <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">ORDERS TO SHIP (<span id="bsm-count">0</span>)</div>
+    <div id="bsm-order-list" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
+    <!-- Progress log -->
+    <div id="bsm-log" style="display:none;background:var(--gray);border-radius:10px;padding:12px;max-height:160px;overflow-y:auto;margin-bottom:14px;font-size:11px;font-weight:700"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-orange" style="flex:1;justify-content:center;padding:13px;font-size:14px" id="bsm-go-btn" onclick="executeBulkShip()">🚀 Ship via Selloship</button>
+      <button class="btn btn-out" style="flex:1;justify-content:center;padding:13px;font-size:14px" id="bsm-manual-btn" onclick="executeBulkManualShip()">✏️ Mark All as Shipped</button>
+      <button class="btn btn-out" onclick="closeBulkShipModal()" style="padding:13px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
