@@ -592,15 +592,6 @@ app.delete('/api/testimonials/:id', async (req, res) => {
 });
 
 
-// ─── Serve Frontend ────────────────────────────────────────────────────────────
-const path = require('path');
-app.use(express.static(path.join(__dirname, 'public')));
-// SPA fallback — serve index.html for unknown routes (except /api)
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  }
-});
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
